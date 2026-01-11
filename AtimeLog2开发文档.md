@@ -232,7 +232,7 @@ lib/
 **核心价值**：处理列表数据与持久化。
 
 * **步骤 2.1 (Model)**：定义 `Category`。
-* 字段：`id`, `name`, `colorHex`, `iconCode`, `order`, `enabled`, `deleted`。
+* 字段：`id`, `name`, `colorHex`, `iconCode`, `order`, `enabled`。
 
 * **步骤 2.2 (Repository)**：实现 `CategoryRepository`。
 * 读写 `current/categories.json`。
@@ -243,7 +243,7 @@ lib/
 
 * **步骤 2.4 (View - Edit)**：
 * 新增/编辑分类的弹窗或页面，颜色用预设色块即可。
-* 删除采用软删除（`deleted=true`）。
+* 删除时直接将分类移除（不再依赖软删除字段）。
 
 ✅ **验收标准**：可以新建“工作”、“休息”分类并持久化。
 
