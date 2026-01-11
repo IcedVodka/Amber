@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/utils/color_utils.dart';
+
 class CategoryColorOption {
   const CategoryColorOption({
     required this.hex,
@@ -66,10 +68,10 @@ CategoryColorOption resolveCategoryColorOption(String? hex) {
 
 List<CategoryColorOption> variantsForSeed(CategoryColorSeed seed) {
   return [
-    _colorVariant(seed, _tint(seed.color, 0.45), '浅'),
+    _colorVariant(seed, tintColor(seed.color, 0.45), '浅'),
     _colorVariant(seed, seed.color, '中'),
-    _colorVariant(seed, _shade(seed.color, 0.25), '深'),
-    _colorVariant(seed, _accent(seed.color), '强调'),
+    _colorVariant(seed, shadeColor(seed.color, 0.25), '深'),
+    _colorVariant(seed, accentColor(seed.color), '强调'),
   ];
 }
 
@@ -79,31 +81,8 @@ CategoryColorOption _colorVariant(
   String variant,
 ) {
   return CategoryColorOption(
-    hex: _toHex(color),
+    hex: colorToHex(color),
     color: color,
     label: '${seed.label}-$variant',
   );
-}
-
-Color _tint(Color color, double amount) {
-  return Color.lerp(color, Colors.white, amount) ?? color;
-}
-
-Color _shade(Color color, double amount) {
-  return Color.lerp(color, Colors.black, amount) ?? color;
-}
-
-Color _accent(Color color) {
-  final hsl = HSLColor.fromColor(color);
-  final saturation = (hsl.saturation + 0.18).clamp(0.0, 1.0);
-  final lightness = (hsl.lightness + 0.04).clamp(0.0, 1.0);
-  return hsl
-      .withSaturation(saturation)
-      .withLightness(lightness)
-      .toColor();
-}
-
-String _toHex(Color color) {
-  final value = color.value & 0xFFFFFF;
-  return '#${value.toRadixString(16).padLeft(6, '0').toUpperCase()}';
 }

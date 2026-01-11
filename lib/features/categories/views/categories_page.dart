@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/category.dart';
-import '../view_models/categories_view_model.dart';
-import 'weight/categories_content.dart';
-import 'weight/category_editor_sheet.dart';
+import '../view_models/categories_list_provider.dart';
+import 'dialogs/category_editor_sheet.dart';
+import 'widgets/categories_content.dart';
 
 class CategoriesPage extends ConsumerWidget {
   const CategoriesPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(categoriesViewModelProvider);
+    final state = ref.watch(categoriesListProvider);
 
     if (state.isLoading) {
       return const SafeArea(
@@ -39,7 +39,7 @@ class CategoriesPage extends ConsumerWidget {
       builder: (context) => CategoryEditorSheet(
         initial: category,
         onSubmit: (value) async {
-          final notifier = ref.read(categoriesViewModelProvider.notifier);
+          final notifier = ref.read(categoriesListProvider.notifier);
           if (category == null) {
             await notifier.addCategory(
               name: value.name,
@@ -60,7 +60,7 @@ class CategoriesPage extends ConsumerWidget {
         onDelete: category == null
             ? null
             : () => ref
-                .read(categoriesViewModelProvider.notifier)
+                .read(categoriesListProvider.notifier)
                 .deleteCategory(category),
       ),
     );

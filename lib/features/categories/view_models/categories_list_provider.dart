@@ -10,9 +10,9 @@ final categoryRepositoryProvider = Provider<CategoryRepository>((ref) {
   return CategoryRepository(FileService());
 });
 
-final categoriesViewModelProvider =
-    NotifierProvider<CategoriesViewModel, CategoriesState>(
-  CategoriesViewModel.new,
+final categoriesListProvider =
+    NotifierProvider<CategoriesListNotifier, CategoriesState>(
+  CategoriesListNotifier.new,
 );
 
 class CategoriesState {
@@ -39,7 +39,7 @@ class CategoriesState {
   }
 }
 
-class CategoriesViewModel extends Notifier<CategoriesState> {
+class CategoriesListNotifier extends Notifier<CategoriesState> {
   @override
   CategoriesState build() {
     _load();
