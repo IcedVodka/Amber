@@ -96,6 +96,10 @@ class CategoriesListNotifier extends Notifier<CategoriesState> {
     await _persist(updated);
   }
 
+  Future<void> replaceAll(List<Category> items) async {
+    await _persist(items);
+  }
+
   int _nextOrder() {
     if (state.items.isEmpty) {
       return 1;

@@ -47,7 +47,7 @@ class _MainTabScaffoldState extends State<MainTabScaffold> {
           NavigationDestination(
             icon: Icon(Icons.grid_view_outlined),
             selectedIcon: Icon(Icons.grid_view),
-            label: '分类',
+            label: '管理',
           ),
           NavigationDestination(
             icon: Icon(Icons.bar_chart_outlined),

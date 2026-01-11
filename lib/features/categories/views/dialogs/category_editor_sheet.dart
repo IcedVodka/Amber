@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../models/category.dart';
 import '../../view_models/category_editor_provider.dart';
-import '../widgets/category_editor_components.dart';
+import '../widgets/category_editor_base.dart';
+import '../widgets/category_editor_color.dart';
+import '../widgets/category_editor_icon.dart';
 
 class CategoryEditorSheet extends ConsumerWidget {
   const CategoryEditorSheet({

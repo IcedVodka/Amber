@@ -3,8 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/category.dart';
 import '../view_models/categories_list_provider.dart';
+import '../view_models/categories_reorder_provider.dart';
 import 'dialogs/category_editor_sheet.dart';
-import 'widgets/categories_content.dart';
+import 'widgets/categories_page_content.dart';
 
 class CategoriesPage extends ConsumerWidget {
   const CategoriesPage({super.key});
@@ -24,6 +25,9 @@ class CategoriesPage extends ConsumerWidget {
         items: state.activeItems,
         onAdd: () => _openEditor(context, ref),
         onEdit: (item) => _openEditor(context, ref, category: item),
+        onReorder: (oldIndex, newIndex) => ref
+            .read(categoriesReorderProvider)
+            .reorder(oldIndex, newIndex),
       ),
     );
   }
