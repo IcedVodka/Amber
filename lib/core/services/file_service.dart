@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 class FileService {
   Future<Directory> _resolveBaseDir() async {
     final dir = await getApplicationDocumentsDirectory();
+    print('Documents dir: ${dir.path}');
     final baseDir = Directory('${dir.path}/atimelog2');
     if (!await baseDir.exists()) {
       await baseDir.create(recursive: true);
@@ -30,6 +31,7 @@ class FileService {
   Future<void> writeJson(String relativePath, Map<String, dynamic> data) async {
     final file = await _resolveFile(relativePath);
     await file.parent.create(recursive: true);
-    await file.writeAsString(jsonEncode(data));
+    const encoder = JsonEncoder.withIndent('  ');
+    await file.writeAsString('${encoder.convert(data)}\n');
   }
 }

@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/category.dart';
 import '../view_models/categories_view_model.dart';
-import 'widgets/categories_content.dart';
-import 'widgets/category_editor_sheet.dart';
+import 'weight/categories_content.dart';
+import 'weight/category_editor_sheet.dart';
 
 class CategoriesPage extends ConsumerWidget {
   const CategoriesPage({super.key});
