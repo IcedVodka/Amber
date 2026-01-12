@@ -19,7 +19,9 @@ class TimelineList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (items.isEmpty) {
-      return const Center(child: Text('今天还没有记录'));
+      return const Center(
+        child: Text('今天还没有记录哦～'),
+      );
     }
     return ListView.separated(
       controller: controller,
@@ -29,16 +31,83 @@ class TimelineList extends StatelessWidget {
       itemBuilder: (context, index) {
         final item = items[index];
         if (item is Note) {
-          return NoteTile(note: item);
+          return TimelineRow(
+            timeLabel: _formatTime(item.createdAt),
+            child: NoteTile(note: item),
+          );
         }
         if (item is TimeRecord) {
-          return RecordTile(
-            record: item,
-            category: categoryMap[item.categoryId],
+          return TimelineRow(
+            timeLabel: _formatTime(item.startAt),
+            child: RecordTile(
+              record: item,
+              category: categoryMap[item.categoryId],
+            ),
           );
         }
         return const SizedBox.shrink();
       },
+    );
+  }
+}
+
+class TimelineRow extends StatelessWidget {
+  const TimelineRow({
+    super.key,
+    required this.timeLabel,
+    required this.child,
+  });
+
+  final String timeLabel;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final timeStyle = Theme.of(context).textTheme.labelMedium;
+    final dividerColor = Theme.of(context).dividerColor;
+
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(width: 52, child: Text(timeLabel, style: timeStyle)),
+          _TimelineMarker(color: dividerColor),
+          Expanded(child: child),
+        ],
+      ),
+    );
+  }
+}
+
+class _TimelineMarker extends StatelessWidget {
+  const _TimelineMarker({required this.color});
+
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 18,
+      child: Column(
+        children: [
+          const SizedBox(height: 2),
+          Container(
+            height: 8,
+            width: 8,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Expanded(
+            child: Container(
+              width: 2,
+              color: color.withOpacity(0.7),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -50,26 +119,16 @@ class NoteTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textStyle = Theme.of(context).textTheme.bodyMedium;
-    final timeStyle = Theme.of(context).textTheme.labelMedium;
-    final dividerColor = Theme.of(context).dividerColor;
+    final textStyle = Theme.of(context).textTheme.bodyMedium?.copyWith(
+          fontStyle: FontStyle.italic,
+          fontFamily: 'Noto Serif CJK SC',
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+          height: 1.4,
+        );
 
-    return Card(
-      margin: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 56,
-              child: Text(_formatTime(note.createdAt), style: timeStyle),
-            ),
-            Container(width: 1, height: 24, color: dividerColor),
-            const SizedBox(width: 12),
-            Expanded(child: Text(note.content, style: textStyle)),
-          ],
-        ),
-      ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 4, 8, 10),
+      child: Text(note.content, style: textStyle),
     );
   }
 }
@@ -90,6 +149,21 @@ class RecordTile extends StatelessWidget {
         ? Icons.label_rounded
         : CategoryIcon.iconByCode(category!.iconCode);
     final color = category?.color ?? Theme.of(context).colorScheme.primary;
+    final headerStyle = Theme.of(context).textTheme.labelMedium?.copyWith(
+          fontWeight: FontWeight.w600,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        );
+    final titleStyle = Theme.of(context).textTheme.titleSmall?.copyWith(
+          fontWeight: FontWeight.w600,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        );
+    final metaStyle = Theme.of(context).textTheme.labelMedium?.copyWith(
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        );
+    final durationStyle = metaStyle?.copyWith(
+      color: color,
+      fontWeight: FontWeight.w600,
+    );
 
     return Card(
       margin: EdgeInsets.zero,
@@ -97,46 +171,75 @@ class RecordTile extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border(left: BorderSide(color: color, width: 4)),
         ),
-        child: ListTile(
-          leading: CircleAvatar(
-            backgroundColor: color.withOpacity(0.2),
-            foregroundColor: color,
-            child: Icon(icon),
-          ),
-          title: Text(category?.name ?? record.categoryId),
-          subtitle: Text(record.content),
-          trailing: _RecordTrailing(
-            durationSec: record.durationSec,
-            weight: record.weight,
-          ),
+        padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _RecordHeader(
+              icon: icon,
+              color: color,
+              label: category?.name ?? record.categoryId,
+              weight: record.weight,
+              style: headerStyle,
+            ),
+            const SizedBox(height: 6),
+            Text(record.content, style: titleStyle),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Text(_formatDuration(record.durationSec), style: durationStyle),
+                Text(' · ${_formatTime(record.endAt)}', style: metaStyle),
+              ],
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _RecordTrailing extends StatelessWidget {
-  const _RecordTrailing({
-    required this.durationSec,
+class _RecordHeader extends StatelessWidget {
+  const _RecordHeader({
+    required this.icon,
+    required this.color,
+    required this.label,
     required this.weight,
+    required this.style,
   });
 
-  final int durationSec;
+  final IconData icon;
+  final Color color;
+  final String label;
   final double weight;
+  final TextStyle? style;
 
   @override
   Widget build(BuildContext context) {
-    final durationStyle = Theme.of(context).textTheme.titleSmall?.copyWith(
+    final chipColor = Theme.of(context).colorScheme.surfaceVariant;
+    final chipTextStyle = Theme.of(context).textTheme.labelSmall?.copyWith(
           fontWeight: FontWeight.w600,
         );
-    final weightStyle = Theme.of(context).textTheme.labelSmall;
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.end,
+    return Row(
       children: [
-        Text(_formatDuration(durationSec), style: durationStyle),
-        Text('Eff ${weight.toStringAsFixed(1)}', style: weightStyle),
+        CircleAvatar(
+          radius: 12,
+          backgroundColor: color.withOpacity(0.18),
+          foregroundColor: color,
+          child: Icon(icon, size: 14),
+        ),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(label.toUpperCase(), style: style),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: chipColor,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Text(' ${weight.toStringAsFixed(1)}', style: chipTextStyle),
+        ),
       ],
     );
   }

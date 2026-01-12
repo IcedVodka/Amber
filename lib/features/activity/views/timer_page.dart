@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../categories/models/category.dart';
 import '../view_models/activity_view_model.dart';
-import 'dialogs/start_timer_dialog.dart';
+import 'dialogs/stop_timer_dialog.dart';
 import 'widgets/focus_panel.dart';
 import 'widgets/smart_input_bar.dart';
 import 'widgets/timeline_list.dart';
@@ -48,19 +48,27 @@ class _TimerPageState extends ConsumerState<TimerPage> {
         child: Column(
           children: [
             FocusPanel(
-              now: state.now,
               categories: state.activeCategories,
               session: session,
               activeCategory: activeCategory,
               currentDuration: session?.currentDuration ?? 0,
-              onStartCategory: (category) => _openStartDialog(
-                category,
-                notifier,
-              ),
+              onStartCategory: _handleStartCategory,
               onPause: notifier.pauseTimer,
               onResume: notifier.resumeTimer,
+              onContentChanged: notifier.updateSessionContent,
               onStop: () async {
-                await notifier.stopTimer();
+                final weight = await showDialog<double>(
+                  context: context,
+                  builder: (_) => StopTimerDialog(
+                    category: activeCategory,
+                    content: session?.content ?? '',
+                    initialWeight: activeCategory?.defaultWeight ?? 1.0,
+                  ),
+                );
+                if (weight == null) {
+                  return;
+                }
+                await notifier.stopTimer(weightOverride: weight);
                 _scrollToBottom();
               },
             ),
@@ -96,18 +104,10 @@ class _TimerPageState extends ConsumerState<TimerPage> {
     return null;
   }
 
-  Future<void> _openStartDialog(
-    Category category,
-    ActivityViewModel notifier,
-  ) async {
-    final content = await showDialog<String>(
-      context: context,
-      builder: (context) => StartTimerDialog(category: category),
-    );
-    if (content == null || content.isEmpty) {
-      return;
-    }
-    await notifier.startTimer(category, content);
+  Future<void> _handleStartCategory(Category category) async {
+    await ref
+        .read(activityViewModelProvider.notifier)
+        .startTimer(category, '');
   }
 
   void _scrollToBottom() {

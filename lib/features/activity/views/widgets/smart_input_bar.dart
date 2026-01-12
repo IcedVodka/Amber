@@ -48,8 +48,8 @@ class _SmartInputBarState extends State<SmartInputBar> {
       top: false,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-        child: Stack(
-          alignment: Alignment.bottomCenter,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             if (_suggestions.isNotEmpty)
               SuggestionPanel(
@@ -131,21 +131,27 @@ class _InputRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Card(
-      margin: EdgeInsets.zero,
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+        dense: true,
+        minVerticalPadding: 6,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14),
         title: TextField(
           controller: controller,
           decoration: const InputDecoration(
-            hintText: '输入 #分类 内容 1h30m *1.0',
+            hintText: '#补录 或 写随笔...',
             border: InputBorder.none,
           ),
           onSubmitted: (_) => onSubmit(),
         ),
-        trailing: IconButton.filled(
+        trailing: IconButton(
           onPressed: onSubmit,
           icon: const Icon(Icons.send_rounded),
+          style: IconButton.styleFrom(
+            backgroundColor: colorScheme.primary,
+            foregroundColor: Colors.white,
+          ),
         ),
       ),
     );
@@ -165,21 +171,20 @@ class SuggestionPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 64),
-      child: Card(
-        margin: EdgeInsets.zero,
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: suggestions
-                .map((item) => _CategoryChip(
-                      category: item,
-                      onSelected: () => onSelected(item),
-                    ))
-                .toList(),
-          ),
+      padding: const EdgeInsets.only(bottom: 8),
+      child: SizedBox(
+        height: 44,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          itemCount: suggestions.length,
+          separatorBuilder: (_, __) => const SizedBox(width: 8),
+          itemBuilder: (context, index) {
+            final item = suggestions[index];
+            return _CategoryChip(
+              category: item,
+              onSelected: () => onSelected(item),
+            );
+          },
         ),
       ),
     );

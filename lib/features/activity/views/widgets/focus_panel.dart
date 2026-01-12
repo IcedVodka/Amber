@@ -1,15 +1,14 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
-import '../../../../core/utils/date_utils.dart';
 import '../../../categories/models/category.dart';
-import '../../../categories/models/category_icons.dart';
 import '../../models/timer_session.dart';
 import 'category_grid.dart';
 
 class FocusPanel extends StatelessWidget {
   const FocusPanel({
     super.key,
-    required this.now,
     required this.categories,
     required this.session,
     required this.activeCategory,
@@ -17,10 +16,10 @@ class FocusPanel extends StatelessWidget {
     required this.onStartCategory,
     required this.onPause,
     required this.onResume,
+    required this.onContentChanged,
     required this.onStop,
   });
 
-  final DateTime now;
   final List<Category> categories;
   final TimerSession? session;
   final Category? activeCategory;
@@ -28,13 +27,13 @@ class FocusPanel extends StatelessWidget {
   final ValueChanged<Category> onStartCategory;
   final VoidCallback onPause;
   final VoidCallback onResume;
+  final ValueChanged<String> onContentChanged;
   final VoidCallback onStop;
 
   @override
   Widget build(BuildContext context) {
     if (session == null) {
       return FocusIdlePanel(
-        now: now,
         categories: categories,
         onStartCategory: onStartCategory,
       );
@@ -46,6 +45,7 @@ class FocusPanel extends StatelessWidget {
       baseColor: activeCategory?.color,
       onPause: onPause,
       onResume: onResume,
+      onContentChanged: onContentChanged,
       onStop: onStop,
     );
   }
@@ -54,54 +54,44 @@ class FocusPanel extends StatelessWidget {
 class FocusIdlePanel extends StatelessWidget {
   const FocusIdlePanel({
     super.key,
-    required this.now,
     required this.categories,
     required this.onStartCategory,
   });
 
-  final DateTime now;
   final List<Category> categories;
   final ValueChanged<Category> onStartCategory;
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _FocusHeader(now: now),
-            const SizedBox(height: 12),
-            CategoryGrid(
-              categories: categories,
-              onSelected: onStartCategory,
-            ),
-          ],
-        ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const _IdleHeader(),
+          const SizedBox(height: 12),
+          CategoryGrid(
+            categories: categories,
+            onSelected: onStartCategory,
+          ),
+        ],
       ),
     );
   }
 }
 
-class _FocusHeader extends StatelessWidget {
-  const _FocusHeader({required this.now});
-
-  final DateTime now;
+class _IdleHeader extends StatelessWidget {
+  const _IdleHeader();
 
   @override
   Widget build(BuildContext context) {
+    final style = Theme.of(context).textTheme.titleMedium?.copyWith(
+          fontWeight: FontWeight.w600,
+        );
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      title: Text(
-        formatFullDate(now),
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-      ),
-      subtitle: Text(formatWeekday(now)),
-      trailing: const Chip(label: Text('今天')),
+      dense: true,
+      title: Text('准备什么工作？', style: style),
     );
   }
 }
@@ -115,6 +105,7 @@ class FocusRunningPanel extends StatelessWidget {
     required this.baseColor,
     required this.onPause,
     required this.onResume,
+    required this.onContentChanged,
     required this.onStop,
   });
 
@@ -124,6 +115,7 @@ class FocusRunningPanel extends StatelessWidget {
   final Color? baseColor;
   final VoidCallback onPause;
   final VoidCallback onResume;
+  final ValueChanged<String> onContentChanged;
   final VoidCallback onStop;
 
   @override
@@ -133,27 +125,33 @@ class FocusRunningPanel extends StatelessWidget {
     final brightness = ThemeData.estimateBrightnessForColor(panelColor);
     final foreground =
         brightness == Brightness.dark ? Colors.white : Colors.black;
+    final muted = foreground.withOpacity(session.isRunning ? 0.9 : 0.6);
 
     return Card(
-      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 8),
       color: panelColor,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 18),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _RunningHeader(
               category: category,
-              content: session.content,
-              foreground: foreground,
+              foreground: muted,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
             _RunningTimer(
               durationSec: currentDuration,
-              foreground: foreground,
+              foreground: muted,
+              isRunning: session.isRunning,
             ),
             const SizedBox(height: 12),
+            _SessionContentEditor(
+              content: session.content,
+              foreground: foreground,
+              onChanged: onContentChanged,
+            ),
+            const SizedBox(height: 14),
             _RunningActions(
               isRunning: session.isRunning,
               foreground: foreground,
@@ -172,33 +170,96 @@ class FocusRunningPanel extends StatelessWidget {
 class _RunningHeader extends StatelessWidget {
   const _RunningHeader({
     required this.category,
-    required this.content,
     required this.foreground,
   });
 
   final Category? category;
-  final String content;
   final Color foreground;
 
   @override
   Widget build(BuildContext context) {
-    final icon = category == null
-        ? Icons.timer_outlined
-        : CategoryIcon.iconByCode(category!.iconCode);
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: CircleAvatar(
-        backgroundColor: foreground.withOpacity(0.2),
-        foregroundColor: foreground,
-        child: Icon(icon),
-      ),
-      title: Text(
-        category?.name ?? '当前专注',
-        style: TextStyle(color: foreground, fontWeight: FontWeight.w600),
-      ),
-      subtitle: Text(
-        content,
-        style: TextStyle(color: foreground.withOpacity(0.8)),
+    final label = (category?.name ?? '专注中').toUpperCase();
+    final labelStyle = Theme.of(context).textTheme.labelLarge?.copyWith(
+          color: foreground.withOpacity(0.85),
+          letterSpacing: 1.2,
+          fontWeight: FontWeight.w600,
+        );
+    return Text(label, style: labelStyle, textAlign: TextAlign.center);
+  }
+}
+
+class _SessionContentEditor extends StatefulWidget {
+  const _SessionContentEditor({
+    required this.content,
+    required this.foreground,
+    required this.onChanged,
+  });
+
+  final String content;
+  final Color foreground;
+  final ValueChanged<String> onChanged;
+
+  @override
+  State<_SessionContentEditor> createState() => _SessionContentEditorState();
+}
+
+class _SessionContentEditorState extends State<_SessionContentEditor> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.content);
+  }
+
+  @override
+  void didUpdateWidget(covariant _SessionContentEditor oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.content != widget.content &&
+        widget.content != _controller.text) {
+      _controller.value = TextEditingValue(
+        text: widget.content,
+        selection: TextSelection.collapsed(offset: widget.content.length),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final textStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
+          color: widget.foreground,
+          fontWeight: FontWeight.w600,
+        );
+    final hintStyle = textStyle?.copyWith(
+      color: widget.foreground.withOpacity(0.7),
+      fontWeight: FontWeight.w500,
+    );
+    return TextField(
+      controller: _controller,
+      onChanged: widget.onChanged,
+      textAlign: TextAlign.center,
+      maxLines: 1,
+      textInputAction: TextInputAction.done,
+      style: textStyle,
+      decoration: InputDecoration(
+        hintText: '任务内容',
+        hintStyle: hintStyle,
+        filled: true,
+        fillColor: widget.foreground.withOpacity(0.12),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 10,
+        ),
       ),
     );
   }
@@ -208,21 +269,28 @@ class _RunningTimer extends StatelessWidget {
   const _RunningTimer({
     required this.durationSec,
     required this.foreground,
+    required this.isRunning,
   });
 
   final int durationSec;
   final Color foreground;
+  final bool isRunning;
 
   @override
   Widget build(BuildContext context) {
     final textStyle = Theme.of(context).textTheme.displaySmall?.copyWith(
           color: foreground,
           fontWeight: FontWeight.w700,
-          letterSpacing: 2,
+          letterSpacing: 3,
+          fontSize: 42,
+          fontFeatures: const [FontFeature.tabularFigures()],
         );
+    final effectiveStyle = isRunning
+        ? textStyle
+        : textStyle?.copyWith(color: foreground.withOpacity(0.7));
     return Text(
       _formatTimer(durationSec),
-      style: textStyle,
+      style: effectiveStyle,
       textAlign: TextAlign.center,
     );
   }
@@ -248,24 +316,50 @@ class _RunningActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        IconButton.filledTonal(
+        _CircleActionButton(
+          icon: isRunning ? Icons.pause_rounded : Icons.play_arrow_rounded,
+          backgroundColor: foreground.withOpacity(0.18),
+          foregroundColor: foreground,
           onPressed: isRunning ? onPause : onResume,
-          icon: Icon(isRunning ? Icons.pause : Icons.play_arrow),
-          style: IconButton.styleFrom(
-            foregroundColor: foreground,
-          ),
         ),
-        FilledButton(
+        const SizedBox(width: 20),
+        _CircleActionButton(
+          icon: Icons.stop_rounded,
+          backgroundColor: Colors.white,
+          foregroundColor: const Color(0xFFE76363),
           onPressed: onStop,
-          style: FilledButton.styleFrom(
-            backgroundColor: foreground,
-            foregroundColor: panelColor,
-          ),
-          child: const Text('结束'),
         ),
       ],
+    );
+  }
+}
+
+class _CircleActionButton extends StatelessWidget {
+  const _CircleActionButton({
+    required this.icon,
+    required this.backgroundColor,
+    required this.foregroundColor,
+    required this.onPressed,
+  });
+
+  final IconData icon;
+  final Color backgroundColor;
+  final Color foregroundColor;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: onPressed,
+      icon: Icon(icon),
+      style: IconButton.styleFrom(
+        backgroundColor: backgroundColor,
+        foregroundColor: foregroundColor,
+        fixedSize: const Size(56, 56),
+        shape: const CircleBorder(),
+      ),
     );
   }
 }

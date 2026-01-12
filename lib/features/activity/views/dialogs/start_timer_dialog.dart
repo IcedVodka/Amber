@@ -33,7 +33,7 @@ class _StartTimerDialogState extends State<StartTimerDialog> {
           child: Icon(icon),
         ),
         title: Text('开始 ${widget.category.name}'),
-        subtitle: const Text('输入本次专注内容'),
+        subtitle: const Text('任务内容'),
       ),
       content: TextField(
         controller: _controller,

@@ -110,6 +110,16 @@ class ActivityViewModel extends Notifier<ActivityViewState> {
     _syncTicker();
   }
 
+  Future<void> updateSessionContent(String content) async {
+    final session = state.session;
+    if (session == null) {
+      return;
+    }
+    final updated = session.copyWith(content: content);
+    state = state.copyWith(session: updated);
+    await ref.read(sessionRepositoryProvider).save(updated);
+  }
+
   Future<void> pauseTimer() async {
     final session = state.session!;
     final now = DateTime.now();
@@ -135,10 +145,11 @@ class ActivityViewModel extends Notifier<ActivityViewState> {
     _syncTicker();
   }
 
-  Future<void> stopTimer() async {
+  Future<void> stopTimer({double? weightOverride}) async {
     final session = state.session!;
     final now = DateTime.now();
     final category = _findCategory(session.categoryId);
+    final weight = weightOverride ?? category?.defaultWeight ?? 1.0;
     final record = TimeRecord(
       id: _newId('record'),
       categoryId: session.categoryId,
@@ -146,11 +157,21 @@ class ActivityViewModel extends Notifier<ActivityViewState> {
       startAt: session.startAt,
       endAt: now,
       durationSec: session.currentDuration,
-      weight: category?.defaultWeight ?? 1.0,
+      weight: weight,
     );
-    final updated = _sorted([...state.items, record]);
-    state = state.copyWith(now: now, items: updated, session: null);
-    await ref.read(timelineRepositoryProvider).saveFor(now, updated);
+    final recordDate = session.startAt;
+    List<TimelineItem> updated;
+    if (_isSameDay(recordDate, now)) {
+      updated = _sorted([...state.items, record]);
+      state = state.copyWith(now: now, items: updated, session: null);
+    } else {
+      final items = await ref.read(timelineRepositoryProvider).loadFor(
+            recordDate,
+          );
+      updated = _sorted([...items, record]);
+      state = state.copyWith(now: now, session: null);
+    }
+    await ref.read(timelineRepositoryProvider).saveFor(recordDate, updated);
     await ref.read(sessionRepositoryProvider).clear();
     _syncTicker();
   }
@@ -190,6 +211,10 @@ class ActivityViewModel extends Notifier<ActivityViewState> {
     final sorted = [...items];
     sorted.sort((a, b) => a.sortTime.compareTo(b.sortTime));
     return sorted;
+  }
+
+  bool _isSameDay(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 
   String _newId(String prefix) {
