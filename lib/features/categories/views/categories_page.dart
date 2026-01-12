@@ -50,6 +50,7 @@ class CategoriesPage extends ConsumerWidget {
               iconCode: value.iconCode,
               colorHex: value.colorHex,
               enabled: value.enabled,
+              defaultWeight: value.defaultWeight,
             );
             return;
           }
@@ -59,6 +60,7 @@ class CategoriesPage extends ConsumerWidget {
             iconCode: value.iconCode,
             colorHex: value.colorHex,
             enabled: value.enabled,
+            defaultWeight: value.defaultWeight,
           );
         },
         onDelete: category == null

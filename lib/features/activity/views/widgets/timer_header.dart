@@ -17,14 +17,14 @@ class TimerHeader extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '今天',
+              formatFullDate(now),
               style: textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w700,
               ),
             ),
             const SizedBox(height: 4),
             Text(
-              formatDateTitle(now),
+              formatWeekday(now),
               style: textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -33,7 +33,7 @@ class TimerHeader extends StatelessWidget {
         ),
         IconButton.filledTonal(
           onPressed: () {},
-          icon: const Icon(Icons.calendar_month),
+          icon: const Icon(Icons.add),
         ),
       ],
     );

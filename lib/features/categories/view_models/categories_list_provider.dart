@@ -56,6 +56,7 @@ class CategoriesListNotifier extends Notifier<CategoriesState> {
     required String iconCode,
     required String colorHex,
     required bool enabled,
+    required double defaultWeight,
   }) async {
     final newItem = Category(
       id: 'cat_${DateTime.now().millisecondsSinceEpoch}',
@@ -64,6 +65,7 @@ class CategoriesListNotifier extends Notifier<CategoriesState> {
       colorHex: colorHex,
       order: _nextOrder(),
       enabled: enabled,
+      defaultWeight: defaultWeight,
     );
     final updated = [...state.items, newItem];
     await _persist(updated);
@@ -75,6 +77,7 @@ class CategoriesListNotifier extends Notifier<CategoriesState> {
     required String iconCode,
     required String colorHex,
     required bool enabled,
+    required double defaultWeight,
   }) async {
     final updated = state.items.map((item) {
       if (item.id != target.id) {
@@ -85,6 +88,7 @@ class CategoriesListNotifier extends Notifier<CategoriesState> {
         iconCode: iconCode,
         colorHex: colorHex,
         enabled: enabled,
+        defaultWeight: defaultWeight,
       );
     }).toList();
     await _persist(updated);

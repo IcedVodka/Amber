@@ -15,12 +15,14 @@ class CategoryFormValue {
     required this.iconCode,
     required this.colorHex,
     required this.enabled,
+    required this.defaultWeight,
   });
 
   final String name;
   final String iconCode;
   final String colorHex;
   final bool enabled;
+  final double defaultWeight;
 }
 
 class CategoryEditorState {
@@ -31,6 +33,7 @@ class CategoryEditorState {
     required this.colorSeed,
     required this.colorOption,
     required this.enabled,
+    required this.defaultWeight,
   });
 
   final String name;
@@ -39,6 +42,7 @@ class CategoryEditorState {
   final CategoryColorSeed colorSeed;
   final CategoryColorOption colorOption;
   final bool enabled;
+  final double defaultWeight;
 
   List<CategoryColorSeed> get seeds => categoryColorSeeds;
   List<CategoryIconGroup> get groups => CategoryIconGroup.values;
@@ -52,11 +56,13 @@ class CategoryEditorState {
     if (trimmed.isEmpty) {
       return null;
     }
+    final normalizedWeight = defaultWeight.clamp(0, 1.0).toDouble();
     return CategoryFormValue(
       name: trimmed,
       iconCode: icon.code,
       colorHex: colorOption.hex,
       enabled: enabled,
+      defaultWeight: normalizedWeight,
     );
   }
 
@@ -67,6 +73,7 @@ class CategoryEditorState {
     CategoryColorSeed? colorSeed,
     CategoryColorOption? colorOption,
     bool? enabled,
+    double? defaultWeight,
   }) {
     return CategoryEditorState(
       name: name ?? this.name,
@@ -75,6 +82,7 @@ class CategoryEditorState {
       colorSeed: colorSeed ?? this.colorSeed,
       colorOption: colorOption ?? this.colorOption,
       enabled: enabled ?? this.enabled,
+      defaultWeight: defaultWeight ?? this.defaultWeight,
     );
   }
 }
@@ -93,6 +101,7 @@ class CategoryEditorNotifier
       colorSeed: seed,
       colorOption: colorOption,
       enabled: initial?.enabled ?? true,
+      defaultWeight: initial?.defaultWeight ?? 1.0,
     );
   }
 
@@ -123,5 +132,17 @@ class CategoryEditorNotifier
 
   void updateEnabled(bool value) {
     state = state.copyWith(enabled: value);
+  }
+
+  void updateDefaultWeight(String value) {
+    if (value.isEmpty) {
+      state = state.copyWith(defaultWeight: 0);
+      return;
+    }
+    final parsed = double.tryParse(value);
+    if (parsed == null) {
+      return;
+    }
+    state = state.copyWith(defaultWeight: parsed);
   }
 }

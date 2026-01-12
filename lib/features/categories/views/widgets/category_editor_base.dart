@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../models/category_colors.dart';
 import '../../models/category_icons.dart';
@@ -109,14 +110,18 @@ class EditorNameHeader extends StatelessWidget {
     required this.enabled,
     required this.onNameChanged,
     required this.onEnabledChanged,
+    required this.defaultWeight,
+    required this.onDefaultWeightChanged,
   });
 
   final String name;
   final CategoryIcon icon;
   final CategoryColorOption color;
   final bool enabled;
+  final double defaultWeight;
   final ValueChanged<String> onNameChanged;
   final ValueChanged<bool> onEnabledChanged;
+  final ValueChanged<String> onDefaultWeightChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -130,6 +135,11 @@ class EditorNameHeader extends StatelessWidget {
             color: color,
             onChanged: onNameChanged,
           ),
+        ),
+        const SizedBox(width: 12),
+        WeightInputField(
+          value: defaultWeight,
+          onChanged: onDefaultWeightChanged,
         ),
         const SizedBox(width: 12),
         EnabledSwitch(
@@ -171,6 +181,58 @@ class EnabledSwitch extends StatelessWidget {
       ],
     );
   }
+}
+
+class WeightInputField extends StatelessWidget {
+  const WeightInputField({
+    super.key,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final double value;
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    return SizedBox(
+      width: 96,
+      child: TextFormField(
+        initialValue: _formatWeight(value),
+        decoration: const InputDecoration(
+          labelText: '权重',
+          hintText: '0-1.0',
+          border: UnderlineInputBorder(),
+        ),
+        style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        inputFormatters: [_weightInputFormatter],
+        textAlign: TextAlign.center,
+        onChanged: onChanged,
+      ),
+    );
+  }
+}
+
+final TextInputFormatter _weightInputFormatter =
+    TextInputFormatter.withFunction((oldValue, newValue) {
+  final text = newValue.text;
+  if (text.isEmpty) {
+    return newValue;
+  }
+  final parsed = double.tryParse(text);
+  if (parsed == null) {
+    return oldValue;
+  }
+  if (parsed < 0 || parsed > 1.0) {
+    return oldValue;
+  }
+  return newValue;
+});
+
+String _formatWeight(double value) {
+  return value.toString();
 }
 
 class SectionTitle extends StatelessWidget {

@@ -1,5 +1,9 @@
-String formatDateTitle(DateTime date) {
-  return '${date.month}月${date.day}日, 星期${_weekdayLabel(date.weekday)}';
+String formatFullDate(DateTime date) {
+  return '${date.year}年${date.month}月${date.day}日';
+}
+
+String formatWeekday(DateTime date) {
+  return '星期${_weekdayLabel(date.weekday)}';
 }
 
 String _weekdayLabel(int weekday) {

@@ -8,6 +8,7 @@ class Category {
     required this.colorHex,
     required this.order,
     required this.enabled,
+    required this.defaultWeight,
   });
 
   final String id;
@@ -16,6 +17,7 @@ class Category {
   final String colorHex;
   final int order;
   final bool enabled;
+  final double defaultWeight;
 
   Color get color => _parseColor(colorHex);
 
@@ -26,6 +28,7 @@ class Category {
     String? colorHex,
     int? order,
     bool? enabled,
+    double? defaultWeight,
   }) {
     return Category(
       id: id ?? this.id,
@@ -34,6 +37,7 @@ class Category {
       colorHex: colorHex ?? this.colorHex,
       order: order ?? this.order,
       enabled: enabled ?? this.enabled,
+      defaultWeight: defaultWeight ?? this.defaultWeight,
     );
   }
 
@@ -45,6 +49,7 @@ class Category {
       colorHex: json['colorHex'] as String,
       order: json['order'] as int,
       enabled: json['enabled'] as bool? ?? true,
+      defaultWeight: (json['defaultWeight'] as num?)?.toDouble() ?? 1.0,
     );
   }
 
@@ -56,6 +61,7 @@ class Category {
       'colorHex': colorHex,
       'order': order,
       'enabled': enabled,
+      'defaultWeight': defaultWeight,
     };
   }
 }

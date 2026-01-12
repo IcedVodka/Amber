@@ -43,6 +43,6 @@ class CategoriesGrid extends StatelessWidget {
 
   int _resolveCrossAxisCount(double extent) {
     final count = (extent / 140).floor();
-    return count < 2 ? 2 : count;
+    return count < 4 ? 4 : count;
   }
 }

@@ -6,7 +6,7 @@ import 'package:path_provider/path_provider.dart';
 class FileService {
   Future<Directory> _resolveBaseDir() async {
     final dir = await getApplicationDocumentsDirectory();
-    print('Documents dir: ${dir.path}');
+    // print('Documents dir: ${dir.path}');
     final baseDir = Directory('${dir.path}/atimelog2');
     if (!await baseDir.exists()) {
       await baseDir.create(recursive: true);
