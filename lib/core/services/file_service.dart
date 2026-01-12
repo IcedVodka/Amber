@@ -34,4 +34,12 @@ class FileService {
     const encoder = JsonEncoder.withIndent('  ');
     await file.writeAsString('${encoder.convert(data)}\n');
   }
+
+  Future<void> deleteFile(String relativePath) async {
+    final file = await _resolveFile(relativePath);
+    if (!await file.exists()) {
+      return;
+    }
+    await file.delete();
+  }
 }
