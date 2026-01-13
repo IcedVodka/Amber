@@ -10,12 +10,14 @@ class CategoriesContent extends StatelessWidget {
     required this.onAdd,
     required this.onEdit,
     required this.onReorder,
+    required this.onOpenDataManage,
   });
 
   final List<Category> items;
   final VoidCallback onAdd;
   final ValueChanged<Category> onEdit;
   final void Function(int oldIndex, int newIndex) onReorder;
+  final VoidCallback onOpenDataManage;
 
   @override
   Widget build(BuildContext context) {
@@ -29,15 +31,21 @@ class CategoriesContent extends StatelessWidget {
           elevation: 0,
           backgroundColor: theme.scaffoldBackgroundColor,
           title: Text(
-            '分类管理',
+            '管理',
             style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
           ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: onAdd,
-            ),
-          ],
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+          sliver: SliverToBoxAdapter(
+            child: _DataManageEntry(onTap: onOpenDataManage),
+          ),
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
+          sliver: SliverToBoxAdapter(
+            child: _CategorySectionHeader(onAdd: onAdd),
+          ),
         ),
         if (items.isEmpty)
           const SliverPadding(
@@ -53,6 +61,47 @@ class CategoriesContent extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _DataManageEntry extends StatelessWidget {
+  const _DataManageEntry({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: ListTile(
+        leading: const CircleAvatar(child: Icon(Icons.edit_note_outlined)),
+        title: const Text('数据编辑管理'),
+        subtitle: const Text('编辑历史记录与便签内容'),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: onTap,
+      ),
+    );
+  }
+}
+
+class _CategorySectionHeader extends StatelessWidget {
+  const _CategorySectionHeader({required this.onAdd});
+
+  final VoidCallback onAdd;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      title: Text(
+        '分类管理',
+        style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+      ),
+      trailing: IconButton(
+        icon: const Icon(Icons.add),
+        onPressed: onAdd,
+      ),
     );
   }
 }

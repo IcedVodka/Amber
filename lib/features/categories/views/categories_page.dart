@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data_manage/views/data_manage_page.dart';
 import '../models/category.dart';
 import '../view_models/categories_list_provider.dart';
 import '../view_models/categories_reorder_provider.dart';
@@ -28,6 +29,7 @@ class CategoriesPage extends ConsumerWidget {
         onReorder: (oldIndex, newIndex) => ref
             .read(categoriesReorderProvider)
             .reorder(oldIndex, newIndex),
+        onOpenDataManage: () => _openDataManage(context),
       ),
     );
   }
@@ -68,6 +70,14 @@ class CategoriesPage extends ConsumerWidget {
             : () => ref
                 .read(categoriesListProvider.notifier)
                 .deleteCategory(category),
+      ),
+    );
+  }
+
+  void _openDataManage(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => const DataManagePage(),
       ),
     );
   }
