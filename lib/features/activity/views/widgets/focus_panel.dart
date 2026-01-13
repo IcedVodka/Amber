@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../categories/models/category.dart';
 import '../../models/timer_session.dart';
+import '../../../sync/views/widgets/hot_sync_entry.dart';
 import 'category_grid.dart';
 
 class FocusPanel extends StatelessWidget {
@@ -18,6 +19,10 @@ class FocusPanel extends StatelessWidget {
     required this.onResume,
     required this.onContentChanged,
     required this.onStop,
+    required this.isSyncing,
+    required this.syncStatus,
+    required this.lastSyncedAt,
+    required this.onHotSync,
   });
 
   final List<Category> categories;
@@ -29,6 +34,10 @@ class FocusPanel extends StatelessWidget {
   final VoidCallback onResume;
   final ValueChanged<String> onContentChanged;
   final VoidCallback onStop;
+  final bool isSyncing;
+  final String syncStatus;
+  final DateTime? lastSyncedAt;
+  final VoidCallback onHotSync;
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +45,10 @@ class FocusPanel extends StatelessWidget {
       return FocusIdlePanel(
         categories: categories,
         onStartCategory: onStartCategory,
+        isSyncing: isSyncing,
+        syncStatus: syncStatus,
+        lastSyncedAt: lastSyncedAt,
+        onHotSync: onHotSync,
       );
     }
     return FocusRunningPanel(
@@ -56,10 +69,18 @@ class FocusIdlePanel extends StatelessWidget {
     super.key,
     required this.categories,
     required this.onStartCategory,
+    required this.isSyncing,
+    required this.syncStatus,
+    required this.lastSyncedAt,
+    required this.onHotSync,
   });
 
   final List<Category> categories;
   final ValueChanged<Category> onStartCategory;
+  final bool isSyncing;
+  final String syncStatus;
+  final DateTime? lastSyncedAt;
+  final VoidCallback onHotSync;
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +89,12 @@ class FocusIdlePanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _IdleHeader(),
+          _IdleHeader(
+            isSyncing: isSyncing,
+            syncStatus: syncStatus,
+            lastSyncedAt: lastSyncedAt,
+            onHotSync: onHotSync,
+          ),
           const SizedBox(height: 12),
           CategoryGrid(
             categories: categories,
@@ -81,7 +107,17 @@ class FocusIdlePanel extends StatelessWidget {
 }
 
 class _IdleHeader extends StatelessWidget {
-  const _IdleHeader();
+  const _IdleHeader({
+    required this.isSyncing,
+    required this.syncStatus,
+    required this.lastSyncedAt,
+    required this.onHotSync,
+  });
+
+  final bool isSyncing;
+  final String syncStatus;
+  final DateTime? lastSyncedAt;
+  final VoidCallback onHotSync;
 
   @override
   Widget build(BuildContext context) {
@@ -92,6 +128,12 @@ class _IdleHeader extends StatelessWidget {
       contentPadding: EdgeInsets.zero,
       dense: true,
       title: Text('准备什么工作？', style: style),
+      trailing: HotSyncEntry(
+        isSyncing: isSyncing,
+        status: syncStatus,
+        lastSyncedAt: lastSyncedAt,
+        onPressed: onHotSync,
+      ),
     );
   }
 }

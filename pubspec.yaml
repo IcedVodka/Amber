@@ -41,6 +41,7 @@ dependencies:
   reorderable_grid_view: ^2.2.8
   shared_preferences: ^2.2.3
   timeline_tile: ^2.0.0
+  webdav_client: ^1.2.2
 
 dev_dependencies:
   flutter_test:

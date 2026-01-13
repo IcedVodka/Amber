@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../categories/models/category.dart';
+import '../../sync/view_models/sync_view_model.dart';
 import '../view_models/activity_view_model.dart';
 import 'dialogs/stop_timer_dialog.dart';
 import 'widgets/focus_panel.dart';
@@ -26,8 +27,26 @@ class _TimerPageState extends ConsumerState<TimerPage> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<SyncViewState>(syncViewModelProvider, (prev, next) {
+      if (next.errorId == prev?.errorId) {
+        return;
+      }
+      final message = next.errorMessage;
+      if (message == null || message.isEmpty) {
+        return;
+      }
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    });
+
     final state = ref.watch(activityViewModelProvider);
     final notifier = ref.read(activityViewModelProvider.notifier);
+    final syncState = ref.watch(syncViewModelProvider);
+    final syncNotifier = ref.read(syncViewModelProvider.notifier);
 
     if (state.isLoading) {
       return const SafeArea(
@@ -71,6 +90,10 @@ class _TimerPageState extends ConsumerState<TimerPage> {
                 await notifier.stopTimer(weightOverride: weight);
                 _scrollToBottom();
               },
+              isSyncing: syncState.isSyncing,
+              syncStatus: syncState.syncStatus,
+              lastSyncedAt: syncState.lastSyncedAt,
+              onHotSync: syncNotifier.triggerHotSync,
             ),
             Expanded(
               child: TimelineList(

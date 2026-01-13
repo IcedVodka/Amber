@@ -3,7 +3,14 @@ import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 
+import 'sync_meta_service.dart';
+
 class FileService {
+  FileService({SyncMetaService? metaService})
+      : _metaService = metaService ?? SyncMetaService();
+
+  final SyncMetaService _metaService;
+
   Future<Directory> _resolveBaseDir() async {
     final dir = await getApplicationDocumentsDirectory();
     // print('Documents dir: ${dir.path}');
@@ -33,6 +40,7 @@ class FileService {
     await file.parent.create(recursive: true);
     const encoder = JsonEncoder.withIndent('  ');
     await file.writeAsString('${encoder.convert(data)}\n');
+    await _metaService.markDirty(relativePath);
   }
 
   Future<void> deleteFile(String relativePath) async {

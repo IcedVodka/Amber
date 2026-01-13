@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../shared/theme/app_theme.dart';
+import '../../../sync/models/sync_config.dart';
+import '../../../sync/views/widgets/sync_settings_section.dart';
 import '../../models/category.dart';
 import 'categories_page_grid.dart';
 import 'software_settings_section.dart';
@@ -15,6 +17,12 @@ class CategoriesContent extends StatelessWidget {
     required this.onOpenDataManage,
     required this.selectedTheme,
     required this.onThemeChange,
+    required this.syncConfig,
+    required this.syncIsLoading,
+    required this.syncIsSyncing,
+    required this.onSyncConfigChanged,
+    required this.onSyncTestConnection,
+    required this.onSyncColdSync,
   });
 
   final List<Category> items;
@@ -24,6 +32,12 @@ class CategoriesContent extends StatelessWidget {
   final VoidCallback onOpenDataManage;
   final AppThemeOption selectedTheme;
   final ValueChanged<AppThemeOption> onThemeChange;
+  final SyncConfig syncConfig;
+  final bool syncIsLoading;
+  final bool syncIsSyncing;
+  final ValueChanged<SyncConfig> onSyncConfigChanged;
+  final Future<void> Function() onSyncTestConnection;
+  final VoidCallback onSyncColdSync;
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +67,19 @@ class CategoriesContent extends StatelessWidget {
             child: SoftwareSettingsSection(
               selectedTheme: selectedTheme,
               onThemeChange: onThemeChange,
+            ),
+          ),
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+          sliver: SliverToBoxAdapter(
+            child: SyncSettingsSection(
+              config: syncConfig,
+              isLoading: syncIsLoading,
+              isSyncing: syncIsSyncing,
+              onConfigChanged: onSyncConfigChanged,
+              onTestConnection: onSyncTestConnection,
+              onColdSync: onSyncColdSync,
             ),
           ),
         ),

@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data_manage/views/data_manage_page.dart';
 import '../../settings/view_models/settings_view_model.dart';
+import '../../sync/view_models/sync_view_model.dart';
+import '../../sync/views/dialogs/sync_progress_dialog.dart';
 import '../models/category.dart';
 import '../view_models/categories_list_provider.dart';
 import '../view_models/categories_reorder_provider.dart';
@@ -17,6 +19,8 @@ class CategoriesPage extends ConsumerWidget {
     final state = ref.watch(categoriesListProvider);
     final settings = ref.watch(settingsViewModelProvider);
     final settingsNotifier = ref.read(settingsViewModelProvider.notifier);
+    final syncState = ref.watch(syncViewModelProvider);
+    final syncNotifier = ref.read(syncViewModelProvider.notifier);
 
     if (state.isLoading) {
       return const SafeArea(
@@ -35,6 +39,16 @@ class CategoriesPage extends ConsumerWidget {
         onOpenDataManage: () => _openDataManage(context),
         selectedTheme: settings.themeOption,
         onThemeChange: settingsNotifier.updateTheme,
+        syncConfig: syncState.config,
+        syncIsLoading: syncState.isLoading,
+        syncIsSyncing: syncState.isSyncing,
+        onSyncConfigChanged: syncNotifier.updateConfig,
+        onSyncTestConnection: () => _testConnection(context, syncNotifier),
+        onSyncColdSync: () => _triggerColdSync(
+          context,
+          syncNotifier,
+          syncState.isSyncing,
+        ),
       ),
     );
   }
@@ -85,5 +99,35 @@ class CategoriesPage extends ConsumerWidget {
         builder: (_) => const DataManagePage(),
       ),
     );
+  }
+
+  Future<void> _testConnection(
+    BuildContext context,
+    SyncViewModel notifier,
+  ) async {
+    final error = await notifier.testConnection();
+    if (!context.mounted) {
+      return;
+    }
+    final message = error ?? '连接成功';
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  void _triggerColdSync(
+    BuildContext context,
+    SyncViewModel notifier,
+    bool isSyncing,
+  ) {
+    if (isSyncing) {
+      return;
+    }
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const SyncProgressDialog(),
+    );
+    notifier.triggerColdSync();
   }
 }

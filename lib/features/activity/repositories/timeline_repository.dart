@@ -21,6 +21,7 @@ class TimelineRepository {
   Future<void> saveFor(DateTime date, List<TimelineItem> items) async {
     final payload = {
       'date': _formatDate(date),
+      'lastModified': DateTime.now().millisecondsSinceEpoch,
       'items': items.map((item) => item.toJson()).toList(),
     };
     await _fileService.writeJson(_filePath(date), payload);

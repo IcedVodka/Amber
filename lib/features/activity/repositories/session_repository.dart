@@ -17,7 +17,9 @@ class SessionRepository {
   }
 
   Future<void> save(TimerSession session) async {
-    await _fileService.writeJson(_filePath, session.toJson());
+    final payload = session.toJson();
+    payload['lastModified'] = DateTime.now().millisecondsSinceEpoch;
+    await _fileService.writeJson(_filePath, payload);
   }
 
   Future<void> clear() async {
