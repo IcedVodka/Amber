@@ -1,7 +1,7 @@
 import 'dart:io';
 
 Future<void> main(List<String> args) async {
-  final defaultDir = Directory('lib/features/categories');
+  final defaultDir = Directory('lib/features/activity');
   final sourceDir = args.isNotEmpty ? Directory(args.first) : defaultDir;
 
   if (!sourceDir.existsSync()) {
