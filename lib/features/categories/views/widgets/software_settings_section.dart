@@ -2,6 +2,54 @@ import 'package:flutter/material.dart';
 
 import '../../../../shared/theme/app_theme.dart';
 
+class SoftwareSettingsSection extends StatelessWidget {
+  const SoftwareSettingsSection({
+    super.key,
+    required this.selectedTheme,
+    required this.onThemeChange,
+  });
+
+  final AppThemeOption selectedTheme;
+  final ValueChanged<AppThemeOption> onThemeChange;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const _SoftwareSettingsHeader(),
+            const SizedBox(height: 12),
+            ThemeSelector(
+              selectedTheme: selectedTheme,
+              onChanged: onThemeChange,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SoftwareSettingsHeader extends StatelessWidget {
+  const _SoftwareSettingsHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: const CircleAvatar(child: Icon(Icons.tune_outlined)),
+      title: Text(
+        '软件设置',
+        style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+      ),
+    );
+  }
+}
+
 class ThemeSelector extends StatelessWidget {
   const ThemeSelector({
     super.key,
@@ -10,7 +58,7 @@ class ThemeSelector extends StatelessWidget {
   });
 
   final AppThemeOption selectedTheme;
-  final ValueChanged<AppThemeOption?> onChanged;
+  final ValueChanged<AppThemeOption> onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +73,7 @@ class ThemeSelector extends StatelessWidget {
       decoration: _buildDecoration(colorScheme, inputBorder),
       dropdownColor: colorScheme.surface,
       items: _buildItems(),
-      onChanged: onChanged,
+      onChanged: (option) => onChanged(option!),
     );
   }
 

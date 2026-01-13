@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../features/activity/views/timer_page.dart';
 import '../../features/categories/views/categories_page.dart';
-import '../../features/settings/views/settings_page.dart';
 import '../../features/stats/views/stats_page.dart';
 
 class MainTabScaffold extends StatefulWidget {
@@ -17,9 +16,8 @@ class _MainTabScaffoldState extends State<MainTabScaffold> {
 
   static const List<Widget> _tabs = [
     TimerPage(),
-    CategoriesPage(),
     StatsPage(),
-    SettingsPage(),
+    CategoriesPage(),
   ];
 
   void _onDestinationSelected(int index) {
@@ -45,19 +43,14 @@ class _MainTabScaffoldState extends State<MainTabScaffold> {
             label: '计时',
           ),
           NavigationDestination(
-            icon: Icon(Icons.grid_view_outlined),
-            selectedIcon: Icon(Icons.grid_view),
-            label: '管理',
-          ),
-          NavigationDestination(
             icon: Icon(Icons.bar_chart_outlined),
             selectedIcon: Icon(Icons.bar_chart),
             label: '统计',
           ),
           NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
-            selectedIcon: Icon(Icons.settings),
-            label: '设置',
+            icon: Icon(Icons.grid_view_outlined),
+            selectedIcon: Icon(Icons.grid_view),
+            label: '管理',
           ),
         ],
       ),

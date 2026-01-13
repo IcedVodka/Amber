@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data_manage/views/data_manage_page.dart';
+import '../../settings/view_models/settings_view_model.dart';
 import '../models/category.dart';
 import '../view_models/categories_list_provider.dart';
 import '../view_models/categories_reorder_provider.dart';
@@ -14,6 +15,8 @@ class CategoriesPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(categoriesListProvider);
+    final settings = ref.watch(settingsViewModelProvider);
+    final settingsNotifier = ref.read(settingsViewModelProvider.notifier);
 
     if (state.isLoading) {
       return const SafeArea(
@@ -30,6 +33,8 @@ class CategoriesPage extends ConsumerWidget {
             .read(categoriesReorderProvider)
             .reorder(oldIndex, newIndex),
         onOpenDataManage: () => _openDataManage(context),
+        selectedTheme: settings.themeOption,
+        onThemeChange: settingsNotifier.updateTheme,
       ),
     );
   }

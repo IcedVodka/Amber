@@ -39,6 +39,7 @@ dependencies:
   go_router: ^12.1.1
   path_provider: ^2.1.4
   reorderable_grid_view: ^2.2.8
+  shared_preferences: ^2.2.3
   timeline_tile: ^2.0.0
 
 dev_dependencies:

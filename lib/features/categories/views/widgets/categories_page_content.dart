@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../../../shared/theme/app_theme.dart';
 import '../../models/category.dart';
 import 'categories_page_grid.dart';
+import 'software_settings_section.dart';
 
 class CategoriesContent extends StatelessWidget {
   const CategoriesContent({
@@ -11,6 +13,8 @@ class CategoriesContent extends StatelessWidget {
     required this.onEdit,
     required this.onReorder,
     required this.onOpenDataManage,
+    required this.selectedTheme,
+    required this.onThemeChange,
   });
 
   final List<Category> items;
@@ -18,6 +22,8 @@ class CategoriesContent extends StatelessWidget {
   final ValueChanged<Category> onEdit;
   final void Function(int oldIndex, int newIndex) onReorder;
   final VoidCallback onOpenDataManage;
+  final AppThemeOption selectedTheme;
+  final ValueChanged<AppThemeOption> onThemeChange;
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +45,15 @@ class CategoriesContent extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
           sliver: SliverToBoxAdapter(
             child: _DataManageEntry(onTap: onOpenDataManage),
+          ),
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+          sliver: SliverToBoxAdapter(
+            child: SoftwareSettingsSection(
+              selectedTheme: selectedTheme,
+              onThemeChange: onThemeChange,
+            ),
           ),
         ),
         SliverPadding(
@@ -76,7 +91,6 @@ class _DataManageEntry extends StatelessWidget {
       child: ListTile(
         leading: const CircleAvatar(child: Icon(Icons.edit_note_outlined)),
         title: const Text('数据编辑管理'),
-        subtitle: const Text('编辑历史记录与便签内容'),
         trailing: const Icon(Icons.chevron_right),
         onTap: onTap,
       ),
