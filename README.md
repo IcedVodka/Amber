@@ -1,6 +1,6 @@
-# atimelog2
+# Amber (流珀)
 
-A new Flutter project.
+流珀 (Amber) Flutter 项目。
 
 ## Getting Started
 

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/file_service.dart';
 import '../../categories/models/category.dart';
 import '../../categories/view_models/categories_list_provider.dart';
+import '../../stats/view_models/stats_view_model.dart';
 import '../models/timeline_item.dart';
 import '../models/timer_session.dart';
 import '../repositories/session_repository.dart';
@@ -70,6 +71,12 @@ class ActivityViewModel extends Notifier<ActivityViewState> {
   @override
   ActivityViewState build() {
     ref.onDispose(() => _ticker?.cancel());
+    ref.listen<CategoriesState>(categoriesListProvider, (prev, next) {
+      if (next.isLoading) {
+        return;
+      }
+      state = state.copyWith(categories: next.items);
+    });
     _load();
     return ActivityViewState(
       now: DateTime.now(),
@@ -174,6 +181,7 @@ class ActivityViewModel extends Notifier<ActivityViewState> {
     await ref.read(timelineRepositoryProvider).saveFor(recordDate, updated);
     await ref.read(sessionRepositoryProvider).clear();
     _syncTicker();
+    _refreshStats();
   }
 
   Future<bool> addFromInput(String text) async {
@@ -186,6 +194,7 @@ class ActivityViewModel extends Notifier<ActivityViewState> {
     final updated = _sorted([...state.items, item]);
     state = state.copyWith(now: now, items: updated);
     await ref.read(timelineRepositoryProvider).saveFor(now, updated);
+    _refreshStats();
     return true;
   }
 
@@ -196,6 +205,10 @@ class ActivityViewModel extends Notifier<ActivityViewState> {
         state = state.copyWith(now: DateTime.now());
       });
     }
+  }
+
+  void _refreshStats() {
+    ref.invalidate(statsViewModelProvider);
   }
 
   Category? _findCategory(String id) {

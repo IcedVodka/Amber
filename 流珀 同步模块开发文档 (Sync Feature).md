@@ -2,7 +2,7 @@
 
 ---
 
-# AtimeLog2 同步模块开发文档 (Sync Feature)
+# 流珀 同步模块开发文档 (Sync Feature)
 
 ## 1. 核心概述
 
@@ -20,7 +20,7 @@
 ### 2.1 云端目录结构 (WebDAV)
 
 ```text
-/AtimeLog2/           # 用户配置的根目录
+/Amber/           # 用户配置的根目录
   current/            # 存放 settings.json, categories.json
   data/
     2025-01/          # 按月归档
@@ -61,7 +61,7 @@ class SyncConfig {
   final String webDavUrl;       // e.g., https://dav.jianguoyun.com/dav/
   final String username;
   final String password;
-  final String targetFolder;    // 默认 "AtimeLog2"
+  final String targetFolder;    // 默认 "Amber"
   
   final bool autoHotSync;       // 是否开启自动热同步
   final bool hotSyncOnStartup;  // 是否启动时热同步
@@ -164,7 +164,7 @@ class SyncConfig {
 * [输入框] 服务器地址 (URL)
 * [输入框] 账号 (Username)
 * [输入框] 密码 (Password) - *掩码显示*
-* [输入框] 目标文件夹 (默认为 AtimeLog2)
+* [输入框] 目标文件夹 (默认为 Amber)
 
 
 2. **连通性测试**：

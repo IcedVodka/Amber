@@ -122,6 +122,19 @@ class StatsViewModel extends Notifier<StatsViewState> {
       report: _emptyReport,
       categoryMap: const {},
     );
+    ref.listen<CategoriesState>(categoriesListProvider, (prev, next) {
+      if (next.isLoading || state.isLoading) {
+        return;
+      }
+      final range = state.dimension == StatsDimension.custom
+          ? state.customRange
+          : null;
+      _load(
+        date: state.selectedDate,
+        dimension: state.dimension,
+        customRange: range,
+      );
+    });
     Future.microtask(() => _load(date: now, dimension: StatsDimension.day));
     return initial;
   }

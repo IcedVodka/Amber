@@ -13,22 +13,30 @@ class StatsMetricCards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isCompact = MediaQuery.of(context).size.width < 360;
+    final spacing = isCompact ? 8.0 : 12.0;
     return Row(
       children: [
-        Expanded(child: _NetTimeCard(summary: summary)),
-        const SizedBox(width: 12),
-        Expanded(child: _EfficiencyCard(summary: summary)),
-        const SizedBox(width: 12),
-        Expanded(child: _GrossTimeCard(summary: summary)),
+        Expanded(child: _NetTimeCard(summary: summary, isCompact: isCompact)),
+        SizedBox(width: spacing),
+        Expanded(
+          child: _EfficiencyCard(summary: summary, isCompact: isCompact),
+        ),
+        SizedBox(width: spacing),
+        Expanded(child: _GrossTimeCard(summary: summary, isCompact: isCompact)),
       ],
     );
   }
 }
 
 class _NetTimeCard extends StatelessWidget {
-  const _NetTimeCard({required this.summary});
+  const _NetTimeCard({
+    required this.summary,
+    required this.isCompact,
+  });
 
   final StatsSummary summary;
+  final bool isCompact;
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +45,7 @@ class _NetTimeCard extends StatelessWidget {
     final accent = theme.colorScheme.primary;
     return _MetricCard(
       backgroundColor: accent.withOpacity(0.08),
+      isCompact: isCompact,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -46,8 +55,8 @@ class _NetTimeCard extends StatelessWidget {
             color: accent,
           ),
           const SizedBox(height: 8),
-          Text(
-            formatDurationCompact(summary.netSec),
+          _ScaleDownText(
+            text: formatDurationCompact(summary.netSec),
             style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 6),
@@ -59,9 +68,13 @@ class _NetTimeCard extends StatelessWidget {
 }
 
 class _EfficiencyCard extends StatelessWidget {
-  const _EfficiencyCard({required this.summary});
+  const _EfficiencyCard({
+    required this.summary,
+    required this.isCompact,
+  });
 
   final StatsSummary summary;
+  final bool isCompact;
 
   @override
   Widget build(BuildContext context) {
@@ -70,6 +83,7 @@ class _EfficiencyCard extends StatelessWidget {
     final accent = _scoreColor(context, summary.efficiency);
     return _MetricCard(
       backgroundColor: accent.withOpacity(0.08),
+      isCompact: isCompact,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -79,16 +93,16 @@ class _EfficiencyCard extends StatelessWidget {
             color: accent,
           ),
           const SizedBox(height: 8),
-          Text(
-            formatScore(summary.efficiency),
+          _ScaleDownText(
+            text: formatScore(summary.efficiency),
             style: textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.w700,
               color: accent,
             ),
           ),
           const SizedBox(height: 6),
-          Text(
-            _scoreLabel(summary.efficiency),
+          _ScaleDownText(
+            text: _scoreLabel(summary.efficiency),
             style: textTheme.labelSmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -100,9 +114,13 @@ class _EfficiencyCard extends StatelessWidget {
 }
 
 class _GrossTimeCard extends StatelessWidget {
-  const _GrossTimeCard({required this.summary});
+  const _GrossTimeCard({
+    required this.summary,
+    required this.isCompact,
+  });
 
   final StatsSummary summary;
+  final bool isCompact;
 
   @override
   Widget build(BuildContext context) {
@@ -110,6 +128,7 @@ class _GrossTimeCard extends StatelessWidget {
     final textTheme = theme.textTheme;
     final accent = theme.colorScheme.secondary;
     return _MetricCard(
+      isCompact: isCompact,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -119,13 +138,13 @@ class _GrossTimeCard extends StatelessWidget {
             color: accent,
           ),
           const SizedBox(height: 8),
-          Text(
-            formatDurationCompact(summary.grossSec),
+          _ScaleDownText(
+            text: formatDurationCompact(summary.grossSec),
             style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 6),
-          Text(
-            'Gross Time',
+          _ScaleDownText(
+            text: 'Gross Time',
             style: textTheme.labelSmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -139,18 +158,21 @@ class _GrossTimeCard extends StatelessWidget {
 class _MetricCard extends StatelessWidget {
   const _MetricCard({
     required this.child,
+    required this.isCompact,
     this.backgroundColor,
   });
 
   final Widget child;
+  final bool isCompact;
   final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
+    final padding = isCompact ? 10.0 : 12.0;
     return Card(
       color: backgroundColor,
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: EdgeInsets.all(padding),
         child: child,
       ),
     );
@@ -180,7 +202,13 @@ class _MetricHeader extends StatelessWidget {
           child: Icon(icon, size: 14),
         ),
         const SizedBox(width: 6),
-        Text(title, style: style),
+        Expanded(
+          child: _ScaleDownText(
+            text: title,
+            style: style,
+            alignment: Alignment.centerLeft,
+          ),
+        ),
       ],
     );
   }
@@ -230,4 +258,25 @@ Color _scoreColor(BuildContext context, double score) {
     return Colors.orange;
   }
   return Theme.of(context).colorScheme.error;
+}
+
+class _ScaleDownText extends StatelessWidget {
+  const _ScaleDownText({
+    required this.text,
+    this.style,
+    this.alignment = Alignment.centerLeft,
+  });
+
+  final String text;
+  final TextStyle? style;
+  final Alignment alignment;
+
+  @override
+  Widget build(BuildContext context) {
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      alignment: alignment,
+      child: Text(text, style: style, maxLines: 1),
+    );
+  }
 }

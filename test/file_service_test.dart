@@ -30,7 +30,7 @@ void main() {
 
     await service.writeJson(relativePath, payload);
 
-    final jsonFile = File('${tempDir.path}/atimelog2/$relativePath');
+    final jsonFile = File('${tempDir.path}/Amber/$relativePath');
     expect(await jsonFile.exists(), isTrue);
     expect(
       jsonDecode(await jsonFile.readAsString()),

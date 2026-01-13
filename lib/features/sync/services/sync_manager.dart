@@ -302,7 +302,7 @@ class SyncManager {
     webdav.Client client,
     _RemoteFileInfo remote,
   ) async {
-    final tempDir = await Directory.systemTemp.createTemp('atimelog2_sync');
+    final tempDir = await Directory.systemTemp.createTemp('amber_sync');
     final tempFile = File('${tempDir.path}/${remote.name}');
     await client.read2File(remote.path, tempFile.path);
     return tempFile;
@@ -335,7 +335,7 @@ class SyncManager {
 
   String _targetRoot(SyncConfig config) {
     final trimmed = config.targetFolder.trim();
-    return trimmed.isEmpty ? 'AtimeLog2' : trimmed;
+    return trimmed.isEmpty ? 'Amber' : trimmed;
   }
 
   String _remotePath(SyncConfig config, String relative) {
@@ -361,7 +361,7 @@ class SyncManager {
 
   Future<Directory> _resolveBaseDir() async {
     final dir = await getApplicationDocumentsDirectory();
-    final baseDir = Directory('${dir.path}/atimelog2');
+    final baseDir = Directory('${dir.path}/Amber');
     if (!await baseDir.exists()) {
       await baseDir.create(recursive: true);
     }

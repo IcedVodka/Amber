@@ -6,7 +6,7 @@ import 'package:path_provider/path_provider.dart';
 class SyncMetaService {
   Future<Directory> _resolveMetaDir() async {
     final dir = await getApplicationDocumentsDirectory();
-    final baseDir = Directory('${dir.path}/atimelog2');
+    final baseDir = Directory('${dir.path}/Amber');
     if (!await baseDir.exists()) {
       await baseDir.create(recursive: true);
     }

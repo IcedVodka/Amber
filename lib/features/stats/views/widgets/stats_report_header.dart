@@ -109,9 +109,17 @@ class _MetaBlock extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: labelStyle),
+        _ScaleDownText(
+          text: label,
+          style: labelStyle,
+          alignment: Alignment.centerLeft,
+        ),
         const SizedBox(height: 4),
-        Text(value, style: valueStyle, maxLines: 2),
+        _ScaleDownText(
+          text: value,
+          style: valueStyle,
+          alignment: Alignment.centerLeft,
+        ),
       ],
     );
   }
@@ -140,14 +148,57 @@ class _KeywordSection extends StatelessWidget {
               ),
         ),
         const SizedBox(height: 6),
-        Wrap(
-          spacing: 8,
-          runSpacing: 6,
-          children: keywords
-              .map((item) => Chip(label: Text(item)))
-              .toList(growable: false),
-        ),
+        _KeywordLine(keywords: keywords),
       ],
+    );
+  }
+}
+
+class _KeywordLine extends StatelessWidget {
+  const _KeywordLine({required this.keywords});
+
+  final List<String> keywords;
+
+  @override
+  Widget build(BuildContext context) {
+    final chips = keywords
+        .map((item) => Chip(label: Text(item)))
+        .toList(growable: false);
+    final children = <Widget>[];
+    for (var i = 0; i < chips.length; i += 1) {
+      children.add(chips[i]);
+      if (i != chips.length - 1) {
+        children.add(const SizedBox(width: 6));
+      }
+    }
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      alignment: Alignment.centerLeft,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: children,
+      ),
+    );
+  }
+}
+
+class _ScaleDownText extends StatelessWidget {
+  const _ScaleDownText({
+    required this.text,
+    this.style,
+    this.alignment = Alignment.center,
+  });
+
+  final String text;
+  final TextStyle? style;
+  final Alignment alignment;
+
+  @override
+  Widget build(BuildContext context) {
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      alignment: alignment,
+      child: Text(text, style: style, maxLines: 1),
     );
   }
 }

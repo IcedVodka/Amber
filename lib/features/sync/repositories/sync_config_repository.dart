@@ -22,7 +22,7 @@ class SyncConfigRepository {
     final map = <String, Object?>{
       'webDavUrl': _preferences.getString(_webDavUrlKey) ?? '',
       'username': _preferences.getString(_usernameKey) ?? '',
-      'targetFolder': _preferences.getString(_targetFolderKey) ?? 'AtimeLog2',
+      'targetFolder': _preferences.getString(_targetFolderKey) ?? 'Amber',
       'autoHotSync': _preferences.getBool(_autoHotSyncKey) ?? false,
       'hotSyncOnStartup': _preferences.getBool(_hotSyncOnStartupKey) ?? true,
       'autoSyncInterval': _preferences.getInt(_autoSyncIntervalKey) ?? 10,

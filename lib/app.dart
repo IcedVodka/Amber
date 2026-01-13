@@ -14,9 +14,10 @@ class AtimeLogApp extends ConsumerWidget {
     final settings = ref.watch(settingsViewModelProvider);
     final themeOption = settings.themeOption;
     final router = ref.watch(appRouterProvider);
+    final locale = WidgetsBinding.instance.platformDispatcher.locale;
 
     return MaterialApp.router(
-      title: AppConfig.appName,
+      title: AppConfig.resolveAppName(locale),
       debugShowCheckedModeBanner: false,
       theme: themeOption.themeData,
       darkTheme: themeOption.themeData,

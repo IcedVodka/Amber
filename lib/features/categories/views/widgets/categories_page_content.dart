@@ -58,16 +58,16 @@ class CategoriesContent extends StatelessWidget {
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
           sliver: SliverToBoxAdapter(
-            child: _DataManageEntry(onTap: onOpenDataManage),
+            child: SoftwareSettingsSection(
+              selectedTheme: selectedTheme,
+              onThemeChange: onThemeChange,
+            ),
           ),
         ),
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
           sliver: SliverToBoxAdapter(
-            child: SoftwareSettingsSection(
-              selectedTheme: selectedTheme,
-              onThemeChange: onThemeChange,
-            ),
+            child: _DataManageEntry(onTap: onOpenDataManage),
           ),
         ),
         SliverPadding(
@@ -114,10 +114,14 @@ class _DataManageEntry extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return Card(
       child: ListTile(
         leading: const CircleAvatar(child: Icon(Icons.edit_note_outlined)),
-        title: const Text('数据编辑管理'),
+        title: Text(
+          '数据编辑管理',
+          style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+        ),
         trailing: const Icon(Icons.chevron_right),
         onTap: onTap,
       ),

@@ -156,15 +156,15 @@ class _DateNavigator extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 6),
               child: Column(
                 children: [
-                  Text(
-                    title,
+                  _ScaleDownText(
+                    text: title,
                     style: textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   const SizedBox(height: 2),
-                  Text(
-                    subtitle,
+                  _ScaleDownText(
+                    text: subtitle,
                     style: textTheme.labelMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
@@ -179,6 +179,30 @@ class _DateNavigator extends StatelessWidget {
           onPressed: onNext,
         ),
       ],
+    );
+  }
+}
+
+class _ScaleDownText extends StatelessWidget {
+  const _ScaleDownText({
+    required this.text,
+    this.style,
+  });
+
+  final String text;
+  final TextStyle? style;
+
+  @override
+  Widget build(BuildContext context) {
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      alignment: Alignment.center,
+      child: Text(
+        text,
+        style: style,
+        maxLines: 1,
+        textAlign: TextAlign.center,
+      ),
     );
   }
 }

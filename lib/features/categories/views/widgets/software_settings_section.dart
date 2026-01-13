@@ -16,35 +16,11 @@ class SoftwareSettingsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const _SoftwareSettingsHeader(),
-            const SizedBox(height: 12),
-            ThemeSelector(
-              selectedTheme: selectedTheme,
-              onChanged: onThemeChange,
-            ),
-          ],
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+        child: ThemeSelector(
+          selectedTheme: selectedTheme,
+          onChanged: onThemeChange,
         ),
-      ),
-    );
-  }
-}
-
-class _SoftwareSettingsHeader extends StatelessWidget {
-  const _SoftwareSettingsHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: const CircleAvatar(child: Icon(Icons.tune_outlined)),
-      title: Text(
-        '软件设置',
-        style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
       ),
     );
   }
@@ -119,29 +95,12 @@ class _ThemeOptionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
-    final subtitleStyle = textTheme.bodySmall?.copyWith(
-      color: colorScheme.onSurfaceVariant,
-    );
-
     return Row(
       children: [
         _ThemeColorDot(color: option.previewColor),
         const SizedBox(width: 10),
         Expanded(
-          child: Text.rich(
-            TextSpan(
-              text: option.label,
-              children: [
-                TextSpan(
-                  text: ' (${option.subtitle})',
-                  style: subtitleStyle,
-                ),
-              ],
-            ),
-          ),
+          child: Text(option.label),
         ),
       ],
     );

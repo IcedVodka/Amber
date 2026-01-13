@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.yourname.atimelog2" "\0"
-            VALUE "FileDescription", "atimelog2" "\0"
+            VALUE "CompanyName", "Amber" "\0"
+            VALUE "FileDescription", "Amber" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "atimelog2" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.yourname.atimelog2. All rights reserved." "\0"
-            VALUE "OriginalFilename", "atimelog2.exe" "\0"
-            VALUE "ProductName", "atimelog2" "\0"
+            VALUE "InternalName", "amber" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 Amber. All rights reserved." "\0"
+            VALUE "OriginalFilename", "amber.exe" "\0"
+            VALUE "ProductName", "Amber" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

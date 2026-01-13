@@ -52,14 +52,39 @@ class _DayHeader extends StatelessWidget {
     final subtitle = '${formatFullDate(date)} · ${formatWeekday(date)}';
     return Card(
       child: ListTile(
-        title: Text(subtitle),
-        trailing: Text(
-          formatDuration(netSec),
+        title: _ScaleDownText(
+          text: subtitle,
+          alignment: Alignment.centerLeft,
+        ),
+        trailing: _ScaleDownText(
+          text: formatDuration(netSec),
           style: Theme.of(context).textTheme.labelMedium?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
+          alignment: Alignment.centerRight,
         ),
       ),
+    );
+  }
+}
+
+class _ScaleDownText extends StatelessWidget {
+  const _ScaleDownText({
+    required this.text,
+    this.style,
+    this.alignment = Alignment.center,
+  });
+
+  final String text;
+  final TextStyle? style;
+  final Alignment alignment;
+
+  @override
+  Widget build(BuildContext context) {
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      alignment: alignment,
+      child: Text(text, style: style, maxLines: 1),
     );
   }
 }

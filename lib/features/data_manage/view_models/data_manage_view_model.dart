@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/file_service.dart';
 import '../../activity/models/timeline_item.dart';
 import '../../activity/repositories/timeline_repository.dart';
+import '../../activity/view_models/activity_view_model.dart';
 import '../../categories/models/category.dart';
 import '../../categories/view_models/categories_list_provider.dart';
+import '../../stats/view_models/stats_view_model.dart';
 
 final dataManageTimelineRepositoryProvider = Provider<TimelineRepository>((ref) {
   return TimelineRepository(FileService());
@@ -78,6 +80,7 @@ class DataManageViewModel extends Notifier<DataManageState> {
     await ref
         .read(dataManageTimelineRepositoryProvider)
         .saveFor(state.selectedDate, sorted);
+    _notifyDataChanged();
   }
 
   Future<void> deleteItem(TimelineItem target) async {
@@ -88,6 +91,7 @@ class DataManageViewModel extends Notifier<DataManageState> {
     await ref
         .read(dataManageTimelineRepositoryProvider)
         .saveFor(state.selectedDate, items);
+    _notifyDataChanged();
   }
 
   Future<void> _load(DateTime date) async {
@@ -110,5 +114,10 @@ class DataManageViewModel extends Notifier<DataManageState> {
 
   DateTime _normalizeDate(DateTime date) {
     return DateTime(date.year, date.month, date.day);
+  }
+
+  void _notifyDataChanged() {
+    ref.invalidate(statsViewModelProvider);
+    ref.invalidate(activityViewModelProvider);
   }
 }

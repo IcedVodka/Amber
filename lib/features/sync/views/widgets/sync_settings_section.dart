@@ -57,6 +57,7 @@ class _SyncSettingsBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isCompact = MediaQuery.of(context).size.width < 360;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
       child: Column(
@@ -68,6 +69,7 @@ class _SyncSettingsBody extends StatelessWidget {
             label: '服务器地址 (URL)',
             hintText: 'https://dav.example.com/dav/',
             initialValue: config.webDavUrl,
+            isCompact: isCompact,
             onChanged: (value) => onConfigChanged(
               config.copyWith(webDavUrl: value),
             ),
@@ -76,6 +78,7 @@ class _SyncSettingsBody extends StatelessWidget {
           _SyncField(
             label: '账号 (Username)',
             initialValue: config.username,
+            isCompact: isCompact,
             onChanged: (value) => onConfigChanged(
               config.copyWith(username: value),
             ),
@@ -85,6 +88,7 @@ class _SyncSettingsBody extends StatelessWidget {
             label: '密码 (Password)',
             initialValue: config.password,
             obscureText: true,
+            isCompact: isCompact,
             onChanged: (value) => onConfigChanged(
               config.copyWith(password: value),
             ),
@@ -93,6 +97,7 @@ class _SyncSettingsBody extends StatelessWidget {
           _SyncField(
             label: '目标文件夹',
             initialValue: config.targetFolder,
+            isCompact: isCompact,
             onChanged: (value) => onConfigChanged(
               config.copyWith(targetFolder: value),
             ),
@@ -100,6 +105,7 @@ class _SyncSettingsBody extends StatelessWidget {
           const SizedBox(height: 12),
           _SyncActionRow(
             isSyncing: isSyncing,
+            isCompact: isCompact,
             onTestConnection: onTestConnection,
             onFullSync: onColdSync,
           ),
@@ -108,6 +114,7 @@ class _SyncSettingsBody extends StatelessWidget {
             enabled: config.autoHotSync,
             startupEnabled: config.hotSyncOnStartup,
             interval: config.autoSyncInterval,
+            isCompact: isCompact,
             onToggle: (value) => onConfigChanged(
               config.copyWith(autoHotSync: value),
             ),
@@ -160,6 +167,7 @@ class _SyncField extends StatelessWidget {
     required this.label,
     required this.initialValue,
     required this.onChanged,
+    required this.isCompact,
     this.hintText,
     this.obscureText = false,
   });
@@ -168,18 +176,24 @@ class _SyncField extends StatelessWidget {
   final String? hintText;
   final String initialValue;
   final bool obscureText;
+  final bool isCompact;
   final ValueChanged<String> onChanged;
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final labelStyle = isCompact ? textTheme.labelSmall : textTheme.labelMedium;
+    final fieldStyle = isCompact ? textTheme.bodySmall : textTheme.bodyMedium;
     return TextFormField(
       initialValue: initialValue,
       obscureText: obscureText,
       enableSuggestions: !obscureText,
       autocorrect: !obscureText,
+      style: fieldStyle,
       decoration: InputDecoration(
         labelText: label,
         hintText: hintText,
+        labelStyle: labelStyle,
         border: const OutlineInputBorder(),
         isDense: true,
       ),
@@ -193,20 +207,53 @@ class _IntervalField extends StatelessWidget {
     required this.value,
     required this.enabled,
     required this.onChanged,
+    required this.isCompact,
   });
 
   final int value;
   final bool enabled;
+  final bool isCompact;
   final ValueChanged<int> onChanged;
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final labelStyle = isCompact ? textTheme.labelSmall : textTheme.labelMedium;
+    final fieldStyle = isCompact ? textTheme.bodySmall : textTheme.bodyMedium;
+    if (isCompact) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('同步间隔(分钟)', style: labelStyle),
+          const SizedBox(height: 6),
+          TextFormField(
+            initialValue: value.toString(),
+            enabled: enabled,
+            keyboardType: TextInputType.number,
+            style: fieldStyle,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              isDense: true,
+            ),
+            onChanged: (value) {
+              final parsed = int.tryParse(value);
+              if (parsed == null) {
+                return;
+              }
+              onChanged(parsed);
+            },
+          ),
+        ],
+      );
+    }
     return TextFormField(
       initialValue: value.toString(),
       enabled: enabled,
       keyboardType: TextInputType.number,
-      decoration: const InputDecoration(
+      style: fieldStyle,
+      decoration: InputDecoration(
         labelText: '同步间隔 (分钟)',
+        labelStyle: labelStyle,
         border: OutlineInputBorder(),
         isDense: true,
       ),
@@ -226,11 +273,13 @@ class _SyncActionRow extends StatelessWidget {
     required this.isSyncing,
     required this.onTestConnection,
     required this.onFullSync,
+    required this.isCompact,
   });
 
   final bool isSyncing;
   final Future<void> Function() onTestConnection;
   final VoidCallback onFullSync;
+  final bool isCompact;
 
   @override
   Widget build(BuildContext context) {
@@ -240,7 +289,10 @@ class _SyncActionRow extends StatelessWidget {
           child: FilledButton.tonalIcon(
             onPressed: isSyncing ? null : () async => onTestConnection(),
             icon: const Icon(Icons.wifi_tethering_outlined),
-            label: const Text('测试连接'),
+            label: _AdaptiveButtonLabel(
+              text: '测试连接',
+              isCompact: isCompact,
+            ),
           ),
         ),
         const SizedBox(width: 12),
@@ -248,7 +300,10 @@ class _SyncActionRow extends StatelessWidget {
           child: FilledButton.icon(
             onPressed: isSyncing ? null : onFullSync,
             icon: const Icon(Icons.sync_outlined),
-            label: const Text('全量同步'),
+            label: _AdaptiveButtonLabel(
+              text: '全量同步',
+              isCompact: isCompact,
+            ),
           ),
         ),
       ],
@@ -264,6 +319,7 @@ class _AutoSyncRow extends StatelessWidget {
     required this.onToggle,
     required this.onStartupToggle,
     required this.onIntervalChanged,
+    required this.isCompact,
   });
 
   final bool enabled;
@@ -272,27 +328,20 @@ class _AutoSyncRow extends StatelessWidget {
   final ValueChanged<bool> onToggle;
   final ValueChanged<bool> onStartupToggle;
   final ValueChanged<int> onIntervalChanged;
+  final bool isCompact;
 
   @override
   Widget build(BuildContext context) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
-          child: Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [             
-              FilterChip(
-                label: const Text('启动时热同步'),
-                selected: startupEnabled,
-                onSelected: onStartupToggle,
-              ),
-              FilterChip(
-                label: const Text('自动热同步'),
-                selected: enabled,
-                onSelected: onToggle,
-              ),
-            ],
+          child: _AutoSyncToggleGroup(
+            enabled: enabled,
+            startupEnabled: startupEnabled,
+            isCompact: isCompact,
+            onToggle: onToggle,
+            onStartupToggle: onStartupToggle,
           ),
         ),
         const SizedBox(width: 12),
@@ -301,9 +350,80 @@ class _AutoSyncRow extends StatelessWidget {
             value: interval,
             enabled: enabled,
             onChanged: onIntervalChanged,
+            isCompact: isCompact,
           ),
         ),
       ],
+    );
+  }
+}
+
+class _AutoSyncToggleGroup extends StatelessWidget {
+  const _AutoSyncToggleGroup({
+    required this.enabled,
+    required this.startupEnabled,
+    required this.isCompact,
+    required this.onToggle,
+    required this.onStartupToggle,
+  });
+
+  final bool enabled;
+  final bool startupEnabled;
+  final bool isCompact;
+  final ValueChanged<bool> onToggle;
+  final ValueChanged<bool> onStartupToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final labelStyle = isCompact ? textTheme.labelSmall : textTheme.labelMedium;
+    final children = [
+      FilterChip(
+        label: const Text('启动时同步'),
+        labelStyle: labelStyle,
+        selected: startupEnabled,
+        onSelected: onStartupToggle,
+      ),
+      FilterChip(
+        label: const Text('自动同步'),
+        labelStyle: labelStyle,
+        selected: enabled,
+        onSelected: onToggle,
+      ),
+    ];
+    if (isCompact) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          children.first,
+          const SizedBox(height: 8),
+          children.last,
+        ],
+      );
+    }
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: children,
+    );
+  }
+}
+
+class _AdaptiveButtonLabel extends StatelessWidget {
+  const _AdaptiveButtonLabel({
+    required this.text,
+    required this.isCompact,
+  });
+
+  final String text;
+  final bool isCompact;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = isCompact ? Theme.of(context).textTheme.labelMedium : null;
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Text(text, maxLines: 1, style: style),
     );
   }
 }

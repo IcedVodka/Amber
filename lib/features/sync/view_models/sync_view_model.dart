@@ -3,6 +3,10 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../activity/view_models/activity_view_model.dart';
+import '../../categories/view_models/categories_list_provider.dart';
+import '../../data_manage/view_models/data_manage_view_model.dart';
+import '../../stats/view_models/stats_view_model.dart';
 import '../models/sync_config.dart';
 import '../repositories/sync_config_repository.dart';
 import '../services/sync_manager.dart';
@@ -156,6 +160,8 @@ class SyncViewModel extends Notifier<SyncViewState> {
         errorId: state.errorId + 1,
       );
       await ref.read(syncConfigRepositoryProvider).save(nextConfig);
+    } finally {
+      _refreshAfterSync();
     }
   }
 
@@ -180,6 +186,8 @@ class SyncViewModel extends Notifier<SyncViewState> {
         errorMessage: e.toString(),
         errorId: state.errorId + 1,
       );
+    } finally {
+      _refreshAfterSync();
     }
   }
 
@@ -226,6 +234,13 @@ class SyncViewModel extends Notifier<SyncViewState> {
       errorMessage: message,
       errorId: state.errorId + 1,
     );
+  }
+
+  void _refreshAfterSync() {
+    ref.invalidate(categoriesListProvider);
+    ref.invalidate(activityViewModelProvider);
+    ref.invalidate(statsViewModelProvider);
+    ref.invalidate(dataManageViewModelProvider);
   }
 
   SyncConfig _normalizeConfig(SyncConfig config) {

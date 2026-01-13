@@ -53,9 +53,30 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.13.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
+
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: false
+  image_path: "asset/Amber2.png"
+  web:
+    generate: true
+    image_path: "asset/Amber2.png"
+    background_color: "#ffffff"
+    theme_color: "#ffffff"
+  windows:
+    generate: true
+    image_path: "asset/Amber2.png"
+    icon_size: 256
+  linux:
+    generate: true
+    image_path: "asset/Amber2.png"
+
+  adaptive_icon_background: "#FFFFFF" # 或者你想要的背景色
+  adaptive_icon_foreground: "asset/Amber2.png" # 你的琥珀图（最好四周有透明像素）
 
 # The following section is specific to Flutter packages.
 flutter:
