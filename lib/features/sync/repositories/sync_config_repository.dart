@@ -10,6 +10,7 @@ class SyncConfigRepository {
   static const _usernameKey = 'sync.username';
   static const _targetFolderKey = 'sync.target_folder';
   static const _autoHotSyncKey = 'sync.auto_hot_sync';
+  static const _hotSyncOnStartupKey = 'sync.hot_sync_on_startup';
   static const _autoSyncIntervalKey = 'sync.auto_sync_interval';
   static const _lastHotSyncAtKey = 'sync.last_hot_sync_at';
   static const _passwordKey = 'sync.password';
@@ -23,6 +24,7 @@ class SyncConfigRepository {
       'username': _preferences.getString(_usernameKey) ?? '',
       'targetFolder': _preferences.getString(_targetFolderKey) ?? 'AtimeLog2',
       'autoHotSync': _preferences.getBool(_autoHotSyncKey) ?? false,
+      'hotSyncOnStartup': _preferences.getBool(_hotSyncOnStartupKey) ?? true,
       'autoSyncInterval': _preferences.getInt(_autoSyncIntervalKey) ?? 10,
       'lastHotSyncAt': _preferences.getInt(_lastHotSyncAtKey),
     };
@@ -34,6 +36,7 @@ class SyncConfigRepository {
     await _preferences.setString(_usernameKey, config.username);
     await _preferences.setString(_targetFolderKey, config.targetFolder);
     await _preferences.setBool(_autoHotSyncKey, config.autoHotSync);
+    await _preferences.setBool(_hotSyncOnStartupKey, config.hotSyncOnStartup);
     await _preferences.setInt(_autoSyncIntervalKey, config.autoSyncInterval);
     if (config.lastHotSyncAt == null) {
       await _preferences.remove(_lastHotSyncAtKey);

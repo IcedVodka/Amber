@@ -12,7 +12,25 @@ class SyncProgressDialog extends ConsumerStatefulWidget {
 }
 
 class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog> {
+  static const int _maxLogs = 200;
+
   final List<String> _logs = [];
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToLatest() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_scrollController.hasClients) {
+        return;
+      }
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +41,11 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog> {
         }
         setState(() {
           _logs.add(next.syncStatus);
+          if (_logs.length > _maxLogs) {
+            _logs.removeRange(0, _logs.length - _maxLogs);
+          }
         });
+        _scrollToLatest();
       }
       if (prev?.isSyncing == true && next.isSyncing == false) {
         if (mounted) {
@@ -35,10 +57,14 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog> {
     return AlertDialog(
       title: const Text('正在冷同步...'),
       content: SizedBox(
-        width: double.maxFinite,
+        width: 320,
+        height: 240,
         child: _logs.isEmpty
             ? const _SyncLogPlaceholder()
-            : _SyncLogList(logs: _logs),
+            : _SyncLogList(
+                logs: _logs,
+                controller: _scrollController,
+              ),
       ),
     );
   }
@@ -64,14 +90,18 @@ class _SyncLogPlaceholder extends StatelessWidget {
 }
 
 class _SyncLogList extends StatelessWidget {
-  const _SyncLogList({required this.logs});
+  const _SyncLogList({
+    required this.logs,
+    required this.controller,
+  });
 
   final List<String> logs;
+  final ScrollController controller;
 
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
-      shrinkWrap: true,
+      controller: controller,
       itemCount: logs.length,
       separatorBuilder: (_, __) => const Divider(height: 16),
       itemBuilder: (context, index) => Text(logs[index]),

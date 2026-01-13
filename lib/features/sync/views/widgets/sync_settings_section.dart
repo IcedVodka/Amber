@@ -106,9 +106,13 @@ class _SyncSettingsBody extends StatelessWidget {
           const SizedBox(height: 8),
           _AutoSyncRow(
             enabled: config.autoHotSync,
+            startupEnabled: config.hotSyncOnStartup,
             interval: config.autoSyncInterval,
             onToggle: (value) => onConfigChanged(
               config.copyWith(autoHotSync: value),
+            ),
+            onStartupToggle: (value) => onConfigChanged(
+              config.copyWith(hotSyncOnStartup: value),
             ),
             onIntervalChanged: (value) => onConfigChanged(
               config.copyWith(autoSyncInterval: value),
@@ -255,24 +259,41 @@ class _SyncActionRow extends StatelessWidget {
 class _AutoSyncRow extends StatelessWidget {
   const _AutoSyncRow({
     required this.enabled,
+    required this.startupEnabled,
     required this.interval,
     required this.onToggle,
+    required this.onStartupToggle,
     required this.onIntervalChanged,
   });
 
   final bool enabled;
+  final bool startupEnabled;
   final int interval;
   final ValueChanged<bool> onToggle;
+  final ValueChanged<bool> onStartupToggle;
   final ValueChanged<int> onIntervalChanged;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        FilterChip(
-          label: const Text('自动热同步'),
-          selected: enabled,
-          onSelected: onToggle,
+        Expanded(
+          child: Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [             
+              FilterChip(
+                label: const Text('启动时热同步'),
+                selected: startupEnabled,
+                onSelected: onStartupToggle,
+              ),
+              FilterChip(
+                label: const Text('自动热同步'),
+                selected: enabled,
+                onSelected: onToggle,
+              ),
+            ],
+          ),
         ),
         const SizedBox(width: 12),
         Expanded(

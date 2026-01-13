@@ -68,6 +68,7 @@ class SyncViewModel extends Notifier<SyncViewState> {
   Timer? _autoTimer;
   StreamSubscription<String>? _statusSubscription;
   _SyncLifecycleObserver? _observer;
+  bool _skipNextResume = false;
 
   @override
   SyncViewState build() {
@@ -108,6 +109,7 @@ class SyncViewModel extends Notifier<SyncViewState> {
       lastSyncedAt: config.lastHotSyncAt,
     );
     _syncAutoTimer(config);
+    _triggerStartupSync(config);
   }
 
   Future<void> updateConfig(SyncConfig config) async {
@@ -206,9 +208,17 @@ class SyncViewModel extends Notifier<SyncViewState> {
   }
 
   void _handleResume() {
-    if (!state.isLoading && state.config.isReady) {
-      triggerHotSync();
+    if (state.isLoading || !state.config.isReady) {
+      return;
     }
+    if (_skipNextResume) {
+      _skipNextResume = false;
+      return;
+    }
+    if (!state.config.autoHotSync) {
+      return;
+    }
+    triggerHotSync();
   }
 
   void _setError(String message) {
@@ -224,6 +234,14 @@ class SyncViewModel extends Notifier<SyncViewState> {
       return config;
     }
     return config.copyWith(autoSyncInterval: interval);
+  }
+
+  void _triggerStartupSync(SyncConfig config) {
+    if (!config.hotSyncOnStartup || !config.isReady) {
+      return;
+    }
+    _skipNextResume = true;
+    triggerHotSync();
   }
 }
 

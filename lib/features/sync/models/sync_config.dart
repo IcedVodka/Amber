@@ -5,6 +5,7 @@ class SyncConfig {
     required this.password,
     required this.targetFolder,
     required this.autoHotSync,
+    required this.hotSyncOnStartup,
     required this.autoSyncInterval,
     required this.lastHotSyncAt,
   });
@@ -14,6 +15,7 @@ class SyncConfig {
   final String password;
   final String targetFolder;
   final bool autoHotSync;
+  final bool hotSyncOnStartup;
   final int autoSyncInterval;
   final DateTime? lastHotSyncAt;
 
@@ -23,6 +25,7 @@ class SyncConfig {
     password: '',
     targetFolder: 'AtimeLog2',
     autoHotSync: false,
+    hotSyncOnStartup: true,
     autoSyncInterval: 10,
     lastHotSyncAt: null,
   );
@@ -37,6 +40,7 @@ class SyncConfig {
     String? password,
     String? targetFolder,
     bool? autoHotSync,
+    bool? hotSyncOnStartup,
     int? autoSyncInterval,
     DateTime? lastHotSyncAt,
   }) {
@@ -46,6 +50,7 @@ class SyncConfig {
       password: password ?? this.password,
       targetFolder: targetFolder ?? this.targetFolder,
       autoHotSync: autoHotSync ?? this.autoHotSync,
+      hotSyncOnStartup: hotSyncOnStartup ?? this.hotSyncOnStartup,
       autoSyncInterval: autoSyncInterval ?? this.autoSyncInterval,
       lastHotSyncAt: lastHotSyncAt ?? this.lastHotSyncAt,
     );
@@ -57,6 +62,7 @@ class SyncConfig {
       'username': username,
       'targetFolder': targetFolder,
       'autoHotSync': autoHotSync,
+      'hotSyncOnStartup': hotSyncOnStartup,
       'autoSyncInterval': autoSyncInterval,
       'lastHotSyncAt': lastHotSyncAt?.millisecondsSinceEpoch,
     };
@@ -73,6 +79,7 @@ class SyncConfig {
       password: password,
       targetFolder: map['targetFolder'] as String? ?? 'AtimeLog2',
       autoHotSync: map['autoHotSync'] as bool? ?? false,
+      hotSyncOnStartup: map['hotSyncOnStartup'] as bool? ?? true,
       autoSyncInterval: map['autoSyncInterval'] as int? ?? 10,
       lastHotSyncAt: lastHotSyncAt == null
           ? null

@@ -64,6 +64,7 @@ class SyncConfig {
   final String targetFolder;    // 默认 "AtimeLog2"
   
   final bool autoHotSync;       // 是否开启自动热同步
+  final bool hotSyncOnStartup;  // 是否启动时热同步
   final int autoSyncInterval;   // 间隔分钟数 (默认10)
   
   final DateTime? lastHotSyncAt; // 上次热同步时间 (用于 UI 显示)
@@ -152,8 +153,8 @@ class SyncConfig {
 
 **自动同步逻辑**：
 
-* 若开启 `autoHotSync`，启动一个 `Timer.periodic`。
-* 倒计时结束时，自动执行上述流程（图标旋转、文字变化）。
+* 若开启 `autoHotSync`，启动一个 `Timer.periodic`，并在恢复前台时触发一次热同步。
+* 若开启 `hotSyncOnStartup`，App 启动后自动执行一次热同步。
 
 ### 4.2 设置页面 - 同步设置栏 (Settings Section)
 
