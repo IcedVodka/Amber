@@ -17,7 +17,7 @@ final timelineRepositoryProvider = Provider<TimelineRepository>((ref) {
 });
 
 final sessionRepositoryProvider = Provider<SessionRepository>((ref) {
-  return SessionRepository(FileService());
+  return SessionRepository();
 });
 
 final activityViewModelProvider =
@@ -67,10 +67,14 @@ class ActivityViewState {
 
 class ActivityViewModel extends Notifier<ActivityViewState> {
   Timer? _ticker;
+  Timer? _dayRolloverTimer;
 
   @override
   ActivityViewState build() {
-    ref.onDispose(() => _ticker?.cancel());
+    ref.onDispose(() {
+      _ticker?.cancel();
+      _dayRolloverTimer?.cancel();
+    });
     ref.listen<CategoriesState>(categoriesListProvider, (prev, next) {
       if (next.isLoading) {
         return;
@@ -100,10 +104,11 @@ class ActivityViewModel extends Notifier<ActivityViewState> {
       isLoading: false,
     );
     _syncTicker();
+    _scheduleDayRollover();
   }
 
   Future<void> startTimer(Category category, String content) async {
-    final now = DateTime.now();
+    final now = await _refreshNow();
     final session = TimerSession(
       isRunning: true,
       categoryId: category.id,
@@ -129,7 +134,7 @@ class ActivityViewModel extends Notifier<ActivityViewState> {
 
   Future<void> pauseTimer() async {
     final session = state.session!;
-    final now = DateTime.now();
+    final now = await _refreshNow();
     final updated = session.copyWith(
       isRunning: false,
       accumulatedSec: session.accumulatedSec +
@@ -142,7 +147,7 @@ class ActivityViewModel extends Notifier<ActivityViewState> {
 
   Future<void> resumeTimer() async {
     final session = state.session!;
-    final now = DateTime.now();
+    final now = await _refreshNow();
     final updated = session.copyWith(
       isRunning: true,
       lastResumeAt: now,
@@ -154,7 +159,7 @@ class ActivityViewModel extends Notifier<ActivityViewState> {
 
   Future<void> stopTimer({double? weightOverride}) async {
     final session = state.session!;
-    final now = DateTime.now();
+    final now = await _refreshNow();
     final category = _findCategory(session.categoryId);
     final weight = weightOverride ?? category?.defaultWeight ?? 1.0;
     final record = TimeRecord(
@@ -190,7 +195,7 @@ class ActivityViewModel extends Notifier<ActivityViewState> {
     if (item == null) {
       return false;
     }
-    final now = DateTime.now();
+    final now = await _refreshNow();
     final updated = _sorted([...state.items, item]);
     state = state.copyWith(now: now, items: updated);
     await ref.read(timelineRepositoryProvider).saveFor(now, updated);
@@ -202,9 +207,31 @@ class ActivityViewModel extends Notifier<ActivityViewState> {
     _ticker?.cancel();
     if (state.session?.isRunning ?? false) {
       _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
-        state = state.copyWith(now: DateTime.now());
+        unawaited(_refreshNow());
       });
     }
+  }
+
+  void _scheduleDayRollover() {
+    _dayRolloverTimer?.cancel();
+    final now = DateTime.now();
+    final next = DateTime(now.year, now.month, now.day + 1);
+    final duration = next.difference(now);
+    _dayRolloverTimer = Timer(duration, () {
+      unawaited(_refreshNow());
+      _scheduleDayRollover();
+    });
+  }
+
+  Future<DateTime> _refreshNow() async {
+    final now = DateTime.now();
+    if (_isSameDay(state.now, now)) {
+      state = state.copyWith(now: now);
+      return now;
+    }
+    final items = await ref.read(timelineRepositoryProvider).loadFor(now);
+    state = state.copyWith(now: now, items: _sorted(items));
+    return now;
   }
 
   void _refreshStats() {

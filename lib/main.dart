@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app.dart';
+import 'core/services/file_service.dart';
+import 'features/activity/repositories/session_repository.dart';
+import 'features/activity/view_models/activity_view_model.dart';
 import 'features/settings/repositories/settings_repository.dart';
 import 'features/settings/view_models/settings_view_model.dart';
 import 'features/sync/repositories/sync_config_repository.dart';
@@ -16,6 +19,12 @@ Future<void> main() async {
       overrides: [
         settingsRepositoryProvider.overrideWithValue(
           SettingsRepository(preferences: preferences),
+        ),
+        sessionRepositoryProvider.overrideWithValue(
+          SessionRepository(
+            preferences: preferences,
+            fileService: FileService(),
+          ),
         ),
         syncConfigRepositoryProvider.overrideWithValue(
           SyncConfigRepository(preferences: preferences),

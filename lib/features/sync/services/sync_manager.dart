@@ -105,6 +105,11 @@ class SyncManager {
     final meta = await _metaService.readMeta(folderKey);
     final remoteMap = await _listRemoteFiles(client, remoteFolderPath);
     final localMap = await _listLocalFiles(folderKey, isFreshMeta: isFreshMeta);
+    if (folderKey == 'current') {
+      const allowList = {'categories.json'};
+      remoteMap.removeWhere((key, _) => !allowList.contains(key));
+      localMap.removeWhere((key, _) => !allowList.contains(key));
+    }
 
     final allNames = <String>{
       ...remoteMap.keys,
