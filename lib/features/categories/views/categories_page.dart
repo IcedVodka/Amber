@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../data_manage/views/data_manage_page.dart';
 import '../../settings/view_models/settings_view_model.dart';
 import '../../sync/view_models/sync_view_model.dart';
 import '../../sync/views/dialogs/sync_progress_dialog.dart';
+import '../../../shared/routes/app_routes.dart';
 import '../models/category.dart';
 import '../view_models/categories_list_provider.dart';
 import '../view_models/categories_reorder_provider.dart';
@@ -94,11 +95,7 @@ class CategoriesPage extends ConsumerWidget {
   }
 
   void _openDataManage(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => const DataManagePage(),
-      ),
-    );
+    context.push(AppRoutes.dataManage);
   }
 
   Future<void> _testConnection(

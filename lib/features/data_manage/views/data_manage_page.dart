@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../activity/models/timeline_item.dart';
 import '../view_models/data_manage_view_model.dart';
@@ -87,11 +88,11 @@ class DataManagePage extends ConsumerWidget {
           content: const Text('确定要删除这条记录吗？'),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context, false),
+              onPressed: () => context.pop(false),
               child: const Text('取消'),
             ),
             FilledButton(
-              onPressed: () => Navigator.pop(context, true),
+              onPressed: () => context.pop(true),
               child: const Text('删除'),
             ),
           ],

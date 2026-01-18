@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../models/category.dart';
 import '../../view_models/category_editor_provider.dart';
@@ -33,7 +34,7 @@ class CategoryEditorSheet extends ConsumerWidget {
         children: [
           EditorHeader(
             title: isEditing ? '编辑分类' : '新增分类',
-            onClose: () => Navigator.pop(context),
+            onClose: () => context.pop(),
           ),
           const SizedBox(height: 12),
           EditorNameHeader(
@@ -108,7 +109,7 @@ class CategoryEditorSheet extends ConsumerWidget {
     }
     await onSubmit(value);
     if (context.mounted) {
-      Navigator.pop(context);
+      context.pop();
     }
   }
 
@@ -119,7 +120,7 @@ class CategoryEditorSheet extends ConsumerWidget {
     }
     await handler();
     if (context.mounted) {
-      Navigator.pop(context);
+      context.pop();
     }
   }
 }

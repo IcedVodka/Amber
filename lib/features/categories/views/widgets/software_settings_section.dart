@@ -40,25 +40,29 @@ class ThemeSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+    final titleStyle =
+        textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600);
     final inputBorder = _buildInputBorder(colorScheme);
 
     return DropdownButtonFormField<AppThemeOption>(
       initialValue: selectedTheme,
       isExpanded: true,
       icon: const Icon(Icons.expand_more),
+      style: titleStyle,
       decoration: _buildDecoration(colorScheme, inputBorder),
       dropdownColor: colorScheme.surface,
-      items: _buildItems(),
+      items: _buildItems(titleStyle),
       onChanged: (option) => onChanged(option!),
     );
   }
 
-  List<DropdownMenuItem<AppThemeOption>> _buildItems() {
+  List<DropdownMenuItem<AppThemeOption>> _buildItems(TextStyle? titleStyle) {
     return AppThemeOption.values
         .map(
           (option) => DropdownMenuItem<AppThemeOption>(
             value: option,
-            child: _ThemeOptionLabel(option: option),
+            child: _ThemeOptionLabel(option: option, style: titleStyle),
           ),
         )
         .toList(growable: false);
@@ -89,9 +93,10 @@ class ThemeSelector extends StatelessWidget {
 }
 
 class _ThemeOptionLabel extends StatelessWidget {
-  const _ThemeOptionLabel({required this.option});
+  const _ThemeOptionLabel({required this.option, required this.style});
 
   final AppThemeOption option;
+  final TextStyle? style;
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +105,7 @@ class _ThemeOptionLabel extends StatelessWidget {
         _ThemeColorDot(color: option.previewColor),
         const SizedBox(width: 10),
         Expanded(
-          child: Text(option.label),
+          child: Text(option.label, style: style),
         ),
       ],
     );

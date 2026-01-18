@@ -16,19 +16,43 @@ class IconGroupSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: [
-        for (final group in groups)
-          ChoiceChip(
-            label: Text(group.label),
-            selected: group == selected,
-            showCheckmark: false,
-            onSelected: (_) => onChanged(group),
-          ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isCompact = constraints.maxWidth < 360;
+        final spacing = isCompact ? 4.0 : 6.0;
+        final labelStyle = _labelStyle(context, isCompact);
+        final chips = <Widget>[];
+        for (var i = 0; i < groups.length; i++) {
+          if (i > 0) {
+            chips.add(SizedBox(width: spacing));
+          }
+          final group = groups[i];
+          chips.add(
+            Expanded(
+              child: ChoiceChip(
+                label: Text(group.label, textAlign: TextAlign.center),
+                labelStyle: labelStyle,
+                selected: group == selected,
+                showCheckmark: false,
+                padding: EdgeInsets.zero,
+                labelPadding:
+                    EdgeInsets.symmetric(horizontal: isCompact ? 4 : 8),
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                visualDensity:
+                    isCompact ? VisualDensity.compact : VisualDensity.standard,
+                onSelected: (_) => onChanged(group),
+              ),
+            ),
+          );
+        }
+        return Row(children: chips);
+      },
     );
+  }
+
+  TextStyle? _labelStyle(BuildContext context, bool isCompact) {
+    final textTheme = Theme.of(context).textTheme;
+    return isCompact ? textTheme.labelSmall : textTheme.labelMedium;
   }
 }
 
@@ -46,21 +70,35 @@ class IconGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: options.length,
-      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: 64,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-      ),
-      itemBuilder: (context, index) {
-        final option = options[index];
-        return IconGridTile(
-          option: option,
-          selected: option.code == selectedCode,
-          onTap: () => onChanged(option),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isCompact = constraints.maxWidth < 360;
+        final spacing = isCompact ? 8.0 : 12.0;
+        final minTileWidth = isCompact ? 56.0 : 64.0;
+        var count = ((constraints.maxWidth + spacing) /
+                (minTileWidth + spacing))
+            .floor();
+        if (count < 5) {
+          count = 5;
+        }
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: options.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: count,
+            mainAxisSpacing: spacing,
+            crossAxisSpacing: spacing,
+            childAspectRatio: 1,
+          ),
+          itemBuilder: (context, index) {
+            final option = options[index];
+            return IconGridTile(
+              option: option,
+              selected: option.code == selectedCode,
+              onTap: () => onChanged(option),
+            );
+          },
         );
       },
     );

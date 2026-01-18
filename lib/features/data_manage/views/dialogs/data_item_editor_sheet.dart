@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../activity/models/timeline_item.dart';
 import '../../../categories/models/category.dart';
@@ -100,7 +101,7 @@ class _RecordEditorSheetState extends State<_RecordEditorSheet> {
               title: '编辑记录',
               icon: icon,
               color: color,
-              onClose: () => Navigator.pop(context),
+              onClose: () => context.pop(),
             ),
             const SizedBox(height: 8),
             if (widget.categories.isEmpty)
@@ -134,7 +135,7 @@ class _RecordEditorSheetState extends State<_RecordEditorSheet> {
             ),
             const SizedBox(height: 12),
             _EditorActions(
-              onCancel: () => Navigator.pop(context),
+              onCancel: () => context.pop(),
               onSubmit: _submit,
             ),
           ],
@@ -207,7 +208,7 @@ class _RecordEditorSheetState extends State<_RecordEditorSheet> {
       weight: weight,
     );
     await widget.onSubmit(updated);
-    Navigator.pop(context);
+    context.pop();
   }
 }
 
@@ -256,7 +257,7 @@ class _NoteEditorSheetState extends State<_NoteEditorSheet> {
               title: '编辑便签',
               icon: Icons.edit_note_outlined,
               color: Theme.of(context).colorScheme.primary,
-              onClose: () => Navigator.pop(context),
+              onClose: () => context.pop(),
             ),
             const SizedBox(height: 8),
             _EditorTextField(
@@ -271,7 +272,7 @@ class _NoteEditorSheetState extends State<_NoteEditorSheet> {
             ),
             const SizedBox(height: 12),
             _EditorActions(
-              onCancel: () => Navigator.pop(context),
+              onCancel: () => context.pop(),
               onSubmit: _submit,
             ),
           ],
@@ -301,7 +302,7 @@ class _NoteEditorSheetState extends State<_NoteEditorSheet> {
       createdAt: createdAt,
     );
     await widget.onSubmit(updated);
-    Navigator.pop(context);
+    context.pop();
   }
 }
 

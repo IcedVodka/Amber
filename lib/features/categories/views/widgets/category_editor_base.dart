@@ -56,47 +56,51 @@ class EditorBody extends StatelessWidget {
   }
 }
 
-class EditorNameRow extends StatelessWidget {
-  const EditorNameRow({
+class EditorIconPreview extends StatelessWidget {
+  const EditorIconPreview({
     super.key,
-    required this.name,
     required this.icon,
     required this.color,
+  });
+
+  final CategoryIcon icon;
+  final CategoryColorOption color;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Center(
+      child: CircleAvatar(
+        backgroundColor: color.color,
+        radius: 22,
+        child: Icon(icon.icon, color: colorScheme.onPrimary),
+      ),
+    );
+  }
+}
+
+class EditorNameField extends StatelessWidget {
+  const EditorNameField({
+    super.key,
+    required this.name,
     required this.onChanged,
   });
 
   final String name;
-  final CategoryIcon icon;
-  final CategoryColorOption color;
   final ValueChanged<String> onChanged;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
-
-    return Row(
-      children: [
-        CircleAvatar(
-          backgroundColor: color.color,
-          radius: 26,
-          child: Icon(icon.icon, color: colorScheme.onPrimary),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: TextFormField(
-            initialValue: name,
-            decoration: const InputDecoration(
-              labelText: '活动名称',
-              border: UnderlineInputBorder(),
-            ),
-            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-            textInputAction: TextInputAction.done,
-            onChanged: onChanged,
-          ),
-        ),
-      ],
+    final textTheme = Theme.of(context).textTheme;
+    return TextFormField(
+      initialValue: name,
+      decoration: const InputDecoration(
+        labelText: '名称',
+        border: UnderlineInputBorder(),
+      ),
+      style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+      textInputAction: TextInputAction.done,
+      onChanged: onChanged,
     );
   }
 }
@@ -129,22 +133,28 @@ class EditorNameHeader extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
-          child: EditorNameRow(
+          child: EditorIconPreview(icon: icon, color: color),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: EditorNameField(
             name: name,
-            icon: icon,
-            color: color,
             onChanged: onNameChanged,
           ),
         ),
         const SizedBox(width: 12),
-        WeightInputField(
-          value: defaultWeight,
-          onChanged: onDefaultWeightChanged,
+        Expanded(
+          child: WeightInputField(
+            value: defaultWeight,
+            onChanged: onDefaultWeightChanged,
+          ),
         ),
         const SizedBox(width: 12),
-        EnabledSwitch(
-          value: enabled,
-          onChanged: onEnabledChanged,
+        Expanded(
+          child: EnabledSwitch(
+            value: enabled,
+            onChanged: onEnabledChanged,
+          ),
         ),
       ],
     );
@@ -196,21 +206,18 @@ class WeightInputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    return SizedBox(
-      width: 96,
-      child: TextFormField(
-        initialValue: _formatWeight(value),
-        decoration: const InputDecoration(
-          labelText: '权重',
-          hintText: '0-1.0',
-          border: UnderlineInputBorder(),
-        ),
-        style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        inputFormatters: [_weightInputFormatter],
-        textAlign: TextAlign.center,
-        onChanged: onChanged,
+    return TextFormField(
+      initialValue: _formatWeight(value),
+      decoration: const InputDecoration(
+        labelText: '权重',
+        hintText: '0-1.0',
+        border: UnderlineInputBorder(),
       ),
+      style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      inputFormatters: [_weightInputFormatter],
+      textAlign: TextAlign.center,
+      onChanged: onChanged,
     );
   }
 }

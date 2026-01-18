@@ -86,12 +86,15 @@ ThemeData _buildTheme({
     useMaterial3: true,
     colorScheme: colorScheme,
     scaffoldBackgroundColor: background,
-    fontFamily: 'Avenir Next',
+    fontFamily: 'Roboto',
     fontFamilyFallback: const [
-      'PingFang SC',
-      'Noto Serif CJK SC',
-      'Source Han Serif SC',
-      'serif',
+      // Windows: 微软雅黑
+      'Microsoft YaHei',
+      // Linux: 文泉驿 
+      'WenQuanYi Micro Hei',
+      'Droid Sans Fallback',
+      'Noto Sans CJK SC', 
+      'sans-serif',
     ],
     appBarTheme: AppBarTheme(
       backgroundColor: Colors.transparent,

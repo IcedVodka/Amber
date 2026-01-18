@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 enum CategoryIconGroup {
   daily('日常'),
-  workStudy('工作学习'),
-  leisure('休闲娱乐'),
+  workStudy('学习'),
+  leisure('娱乐'),
   sports('运动'),
   transport('交通'),
   social('社交');

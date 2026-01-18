@@ -117,7 +117,6 @@ class _DataManageEntry extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     return Card(
       child: ListTile(
-        leading: const CircleAvatar(child: Icon(Icons.edit_note_outlined)),
         title: Text(
           '数据编辑管理',
           style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),

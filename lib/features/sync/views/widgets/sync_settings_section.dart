@@ -59,12 +59,12 @@ class _SyncSettingsBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final isCompact = MediaQuery.of(context).size.width < 360;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const _SyncSettingsHeader(),
-          const SizedBox(height: 12),
+          // const SizedBox(height: 12),
           _SyncField(
             label: '服务器地址 (URL)',
             hintText: 'https://dav.example.com/dav/',
@@ -138,8 +138,6 @@ class _SyncSettingsHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: const CircleAvatar(child: Icon(Icons.cloud_sync_outlined)),
       title: Text(
         '同步设置',
         style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),

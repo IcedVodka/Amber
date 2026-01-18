@@ -89,7 +89,10 @@ class SyncViewModel extends Notifier<SyncViewState> {
       state = state.copyWith(syncStatus: status);
     });
 
-    _observer = _SyncLifecycleObserver(_handleResume);
+    _observer = _SyncLifecycleObserver(
+      onResumed: _handleResume,
+      onPaused: _handlePause,
+    );
     WidgetsBinding.instance.addObserver(_observer!);
 
     _loadConfig();
@@ -219,6 +222,7 @@ class SyncViewModel extends Notifier<SyncViewState> {
     if (state.isLoading || !state.config.isReady) {
       return;
     }
+    _syncAutoTimer(state.config);
     if (_skipNextResume) {
       _skipNextResume = false;
       return;
@@ -226,7 +230,23 @@ class SyncViewModel extends Notifier<SyncViewState> {
     if (!state.config.autoHotSync) {
       return;
     }
-    triggerHotSync();
+    Future<void>.delayed(const Duration(seconds: 1)).then((_) {
+      if (WidgetsBinding.instance.lifecycleState !=
+          AppLifecycleState.resumed) {
+        return;
+      }
+      if (state.isLoading || !state.config.isReady) {
+        return;
+      }
+      if (!state.config.autoHotSync) {
+        return;
+      }
+      triggerHotSync();
+    });
+  }
+
+  void _handlePause() {
+    _autoTimer?.cancel();
   }
 
   void _setError(String message) {
@@ -261,14 +281,20 @@ class SyncViewModel extends Notifier<SyncViewState> {
 }
 
 class _SyncLifecycleObserver extends WidgetsBindingObserver {
-  _SyncLifecycleObserver(this.onResumed);
+  _SyncLifecycleObserver({
+    required this.onResumed,
+    required this.onPaused,
+  });
 
   final VoidCallback onResumed;
+  final VoidCallback onPaused;
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       onResumed();
+    } else if (state == AppLifecycleState.paused) {
+      onPaused();
     }
   }
 

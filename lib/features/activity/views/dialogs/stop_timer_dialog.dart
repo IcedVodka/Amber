@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../categories/models/category.dart';
 import '../../../categories/models/category_icons.dart';
@@ -52,7 +53,7 @@ class _StopTimerDialogState extends State<StopTimerDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => context.pop(),
           child: const Text('取消'),
         ),
         FilledButton(
@@ -65,7 +66,7 @@ class _StopTimerDialogState extends State<StopTimerDialog> {
 
   void _submit() {
     final weight = _parseWeight(_controller.text, widget.initialWeight);
-    Navigator.of(context).pop(weight);
+    context.pop(weight);
   }
 }
 

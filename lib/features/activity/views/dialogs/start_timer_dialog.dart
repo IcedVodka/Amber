@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../categories/models/category.dart';
 import '../../../categories/models/category_icons.dart';
@@ -46,7 +47,7 @@ class _StartTimerDialogState extends State<StartTimerDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => context.pop(),
           child: const Text('取消'),
         ),
         FilledButton(
@@ -59,6 +60,6 @@ class _StartTimerDialogState extends State<StartTimerDialog> {
 
   void _submit() {
     final value = _controller.text.trim();
-    Navigator.of(context).pop(value);
+    context.pop(value);
   }
 }
